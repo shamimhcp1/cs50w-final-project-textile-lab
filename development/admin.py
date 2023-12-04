@@ -8,6 +8,3 @@ admin.site.register(DevFormat)
 admin.site.register(DevColorShade)
 admin.site.register(DevRequirement)
 admin.site.register(DevReport)
-
-
-

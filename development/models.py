@@ -74,7 +74,8 @@ class DevRequirement(models.Model):
     tensile_weft = models.CharField(max_length=5, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.buyer.name}, {self.format.format_label}, {self.color_shade.color_shade}"
+        color_shade = self.color_shade.color_shade if self.color_shade else ""
+        return f"{self.buyer.name}, {self.format.format_label}, {color_shade}"
 
 class DevReport(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
@@ -100,7 +101,7 @@ class DevReport(models.Model):
     tensile_warp = models.CharField(max_length=20, null=True, blank=True)
     tensile_weft = models.CharField(max_length=20, null=True, blank=True)
     tensile_comment = models.CharField(max_length=20, default="N/A")
-    result = models.CharField(max_length=20)
+    result = models.CharField(max_length=20, default="See data")
 
     def __str__(self):
         return f"{self.style} - {self.sample_type} - {self.color} - Fabric ref - {self.fab_ref} - Buyer - {self.buyer.name}"
