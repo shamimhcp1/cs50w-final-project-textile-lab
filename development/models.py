@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
 from django.core.files.storage import default_storage
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 
 
@@ -32,20 +32,33 @@ class Buyer(models.Model):
         return self.name
 
 def format_file_path(instance, filename):
-    # Get the buyer's name
-    buyer_name = instance.buyer.name if instance.buyer else 'unknown_buyer'
-    
     # the path where the file will be stored
-    return os.path.join('development', 'static', 'development', 'format', buyer_name, f"{timezone.now().strftime('%Y%m%d%H%M%S')}_{filename}")
+    return os.path.join('development', 'static', 'development', 'formats', filename)
 
 class DevFormat(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True)
-    format_path = models.FileField(upload_to=format_file_path, blank=True, null=True)
     format_label = models.CharField(max_length=100)
+    format_path = models.FileField(upload_to=format_file_path, blank=True, null=True, unique=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.buyer.name}, {self.format_label}"
-    
+        if self.is_active:
+            status = 'Active'
+        else:
+            status = 'Deactive'
+        return f"{self.format_label}, ({status})"
+
+
+@receiver(pre_save, sender=DevFormat)
+def dev_format_pre_save(sender, instance, **kwargs):
+    # Deactivate previously active formats if the new entry is active
+    if instance.is_active:
+        DevFormat.objects.exclude(pk=instance.pk).update(is_active=False)
+
+    # If the entry is being edited and set to active, deactivate other active formats
+    elif instance.pk:
+        DevFormat.objects.exclude(pk=instance.pk).update(is_active=False)
+
+
 # Signal to delete associated file when DevFormat instance is deleted
 @receiver(pre_delete, sender=DevFormat)
 def delete_format_file(sender, instance, **kwargs):
@@ -55,41 +68,37 @@ def delete_format_file(sender, instance, **kwargs):
         if default_storage.exists(file_path):
             default_storage.delete(file_path)
 
-class DevColorShade(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True)
-    color_shade = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.buyer.name}, {self.color_shade}"
-
 class DevRequirement(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True)
-    format = models.ForeignKey(DevFormat, on_delete=models.SET_NULL, null=True, blank=True)
-    color_shade = models.ForeignKey(DevColorShade, on_delete=models.SET_NULL, null=True, blank=True)
+    buyer = models.ForeignKey(Buyer, on_delete=models.PROTECT)
+    requirement_label = models.CharField(max_length=255, unique=True)
     dry_rubbing = models.CharField(max_length=255, null=True, blank=True)
     wet_rubbing = models.CharField(max_length=255, null=True, blank=True)
+    rubbing_method = models.CharField(max_length=100, null=True, blank=True)
+    rubbing_text = models.CharField(max_length=100, null=True, blank=True)
     wash_tear_warp = models.CharField(max_length=20, null=True, blank=True)
     wash_tear_weft = models.CharField(max_length=20, null=True, blank=True)
+    tear_method = models.CharField(max_length=100, null=True, blank=True)
+    tear_text = models.CharField(max_length=100, null=True, blank=True)
     tensile_warp = models.CharField(max_length=20, null=True, blank=True)
     tensile_weft = models.CharField(max_length=20, null=True, blank=True)
+    tensile_method = models.CharField(max_length=100, null=True, blank=True)
+    tensile_text = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        color_shade = self.color_shade.color_shade if self.color_shade else ""
-        return f"{self.buyer.name}, {self.format.format_label}, {color_shade}"
+        return f"{self.buyer.name}, {self.requirement_label}"
 
 class DevReport(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
-    format = models.ForeignKey(DevFormat, on_delete=models.CASCADE)
-    color_shade = models.ForeignKey(DevColorShade, on_delete=models.CASCADE, null=True, blank=True)
+    buyer = models.ForeignKey(Buyer, on_delete=models.PROTECT)
+    requirement = models.ForeignKey(DevRequirement, on_delete=models.PROTECT, null=True, blank=True)
     style = models.CharField(max_length=255)
     color = models.CharField(max_length=50, null=True, blank=True)
     fab_ref = models.CharField(max_length=50)
     fab_supplier = models.CharField(max_length=50, null=True, blank=True)
     sample_type = models.CharField(max_length=50)
-    receive_date = models.DateField()
-    report_date = models.DateField()
+    receive_date = models.DateField(default=timezone.now)
+    report_date = models.DateField(default=timezone.now)
     create_date = models.DateField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     dry_rubbing = models.CharField(max_length=10, null=True, blank=True)
     wet_rubbing = models.CharField(max_length=10, null=True, blank=True)
     rubbing_comment = models.CharField(max_length=50, null=True, blank=True)

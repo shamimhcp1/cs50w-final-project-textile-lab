@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse
-
+from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import serializers, status
-
 from .models import Buyer, DevReport
 from .serializers import BuyerSerializer, DevReportSerializer
+
+from .forms import DevReportForm
+from .utils import generate_report
 
 from django.templatetags.static import static
 # dev_format_url = static('app/format/dev_format.xlsx')
@@ -19,6 +21,9 @@ def ApiOverview(request):
         'home': '/',
         'buyer_list_create_view': '/buyers',
         'buyer_detail_view': '/buyers/pk',
+        'dev_report_list_view' : '/reports',
+        'dev_report_detail_view' : '/reports/pk',
+        'dev_report_create' : '/create'
     }
     return Response(api_urls)
 
@@ -29,14 +34,37 @@ def dev_report_list_view(request):
     serializer = DevReportSerializer(reports, many=True)
     return Response(serializer.data)
 
+
 # Report Create
-@api_view(['POST'])
+# @api_view(['POST'])
 def dev_report_create(request):
-    serializer = DevReportSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        form = DevReportForm(request.POST)
+        if form.is_valid():
+            dev_report = form.save(commit=False)
+            dev_report.created_by = request.user
+            dev_report.save()
+
+            # Generate the report
+            # generate_report(dev_report)
+
+            return redirect('dev-report-create')  # Redirect to the same page after submission
+
+    else:
+        form = DevReportForm()
+
+    return render(request, 'development/index.html', {
+        'form': form
+    })
+
+    
+    # serializer = DevReportSerializer(data=request.data)
+    # if serializer.is_valid():
+    #     # serializer.save()
+    #     create_pdf_excel(request) # save a pdf & excel copy of the report
+        
+    # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Report Details 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
