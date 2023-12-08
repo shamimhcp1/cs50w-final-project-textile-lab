@@ -46,9 +46,13 @@ def dev_report_create(request):
             dev_report.save()
 
             # Generate the report
-            # generate_report(dev_report)
+            message = generate_report(dev_report)
+            if message == "Success":
+                return HttpResponse("Success")
+            else:
+                return HttpResponse(f"Error: {message}")
 
-            return redirect('dev-report-create')  # Redirect to the same page after submission
+            # return redirect('dev-report-create')  # Redirect to the same page after submission
 
     else:
         form = DevReportForm()

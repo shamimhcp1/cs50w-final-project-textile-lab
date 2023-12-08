@@ -97,8 +97,6 @@ class DevReport(models.Model):
     sample_type = models.CharField(max_length=50)
     receive_date = models.DateField(default=timezone.now)
     report_date = models.DateField(default=timezone.now)
-    create_date = models.DateField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     dry_rubbing = models.CharField(max_length=10, null=True, blank=True)
     wet_rubbing = models.CharField(max_length=10, null=True, blank=True)
     rubbing_comment = models.CharField(max_length=50, null=True, blank=True)
@@ -111,6 +109,10 @@ class DevReport(models.Model):
     tensile_weft = models.CharField(max_length=20, null=True, blank=True)
     tensile_comment = models.CharField(max_length=20, null=True, blank=True)
     result = models.CharField(max_length=50, null=True, blank=True)
+    create_date = models.DateField(default=timezone.now)
+    create_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    pdf_path = models.URLField(max_length=255, null=True, blank=True)
+    excel_path = models.URLField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"{self.style} - {self.sample_type} - {self.color} - Fabric ref - {self.fab_ref} - Buyer - {self.buyer.name}"
