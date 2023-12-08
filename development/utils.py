@@ -5,9 +5,9 @@ import win32com.client as win32
 import pythoncom  # Import the pythoncom module
 
 
-def convert_excel_to_pdf(excel_file_name):
-    input_excel_file = os.path.abspath(os.path.join('development', 'static', 'development', 'reports', excel_file_name + '.xlsx'))
-    output_pdf_file = os.path.join('development', 'static', 'development', 'reports', excel_file_name + '.pdf')
+def convert_excel_to_pdf(excel_file_name, buyer_name):
+    input_excel_file = os.path.abspath(os.path.join('development', 'static', 'development', 'reports', buyer_name, excel_file_name + '.xlsx'))
+    output_pdf_file = os.path.join('development', 'static', 'development', 'reports', buyer_name, excel_file_name + '.pdf')
 
     if not os.path.exists(input_excel_file):
         return f"Error: Excel file not found at {input_excel_file}"
@@ -182,9 +182,9 @@ def generate_report(dev_report):
     else:
         excel_file_name = f"{dev_report.style} - {dev_report.color} - {dev_report.sample_type} - Fabric Ref - {dev_report.fab_ref}"
             
-    wb.save(os.path.join('development', 'static', 'development', 'reports', excel_file_name + '.xlsx'))
+    wb.save(os.path.join('development', 'static', 'development', 'reports', dev_report.buyer.name, excel_file_name + '.xlsx'))
     
 
     # Convert Excel to PDF
-    message = convert_excel_to_pdf(excel_file_name)
+    message = convert_excel_to_pdf(excel_file_name, dev_report.buyer.name)
     return message
