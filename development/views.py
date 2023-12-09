@@ -70,6 +70,9 @@ def dev_report_create(request):
     # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def dev_report_details(request):
+    return render(request, 'development/report-details.html')
+
 # Report Details 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def dev_report_detail_view(request, pk):
