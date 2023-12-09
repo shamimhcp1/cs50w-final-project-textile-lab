@@ -6,8 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>DevReport Invoice</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         /* Add your custom styles here */
         body {
@@ -77,44 +75,48 @@
 <body>
 
     <div class="invoice">
-        <div class="invoice-header">
+        <div class="invoice-header" style="padding: 10px;">
             <!-- Add your logo here -->
-            <img src="{% static 'development/logo.png' %}" alt="Logo" style="max-width: 150px; height: auto;">
-            <h2><strong>TUSUKA LABORATORY</strong></h2>
+            <img src="development/static/development/logo.png" alt="Logo" style="width: auto; height: 50px;">
+            <h1 style="font-size: 30px; margin: 0;"><strong>TUSUKA LABORATORY</strong></h1>
         </div>
 
         <div class="invoice-details">
-            <table>
-                <tr>
-                    <td style="width: 25%">
-                        <p><strong>Buyer:</strong></p>
-                        <p><strong>Order No:</strong></p>
-                        <p><strong>Style:</strong></p>
-                        <p><strong>Color:</strong></p>
-                        <p><strong>Sample Type:</strong></p>
-                    </td>
-                    <td style="width: 25%; text-align: center;">
-                        <p><strong>LPP</strong></p>
-                        <p>N/A</p>
-                        <p>9379S</p>
-                        <p>55J</p>
-                        <p>Dev</p>
-                    </td>
-                    <td style="width: 25%;">
-                        <p><strong>Receive Date:</strong></p>
-                        <p><strong>Report Date:</strong></p>
-                        <p><strong>Fabric Reference:</strong></p>
-                        <p><strong>Fabric Supplier:</strong></p>
-                    </td>
-                    <td style="width: 25%; text-align: center;">
-                        <p>19-09-2023</p>
-                        <p>09-10-2023</p>
-                        <p>TD-4001</p>
-                        <p>Texline</p>
-                    </td>
-                </tr>
-            </table>
+
+        <table class="table">
             
+            <tbody>
+                <tr>
+                    <td><strong>Buyer: </strong></td>
+                    <td><strong>LPP</strong></td>
+                    <td><strong>Receive Date:</strong></td>
+                    <td>2023-01-10</td>
+                </tr>
+                <tr>
+                    <td><strong>Order No: </strong></td>
+                    <td>N/A</td>
+                    <td><strong>Report Date:</strong></td>
+                    <td>2023-01-10</td>
+                </tr>
+                <tr>
+                    <td><strong>Style: </strong></td>
+                    <td>1234s</td>
+                    <td><strong>Fabric Reference:</strong></td>
+                    <td>Td-4001</td>
+                </tr>
+                <tr>
+                    <td><strong>Color: </strong></td>
+                    <td>55j</td>
+                    <td><strong>Fabric Supplier:</strong></td>
+                    <td>Texline</td>
+                </tr>
+                <tr>
+                    <td><strong>Sample Type: </strong></td>
+                    <td>Dev</td>
+                </tr>
+            </tbody>
+        </table>
+
         </div>
 
         <table class="table">
@@ -123,12 +125,20 @@
                     <th>Sample Type</th>
                     <th>Receive Date</th>
                     <th>Report Date</th>
+                    <th>Report Date</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>T-shirt</td>
                     <td>2023-01-01</td>
+                    <td>2023-01-10</td>
+                    <td>2023-01-10</td>
+                </tr>
+                <tr>
+                    <td>T-shirt 2</td>
+                    <td>2023-01-01</td>
+                    <td>2023-01-10</td>
                     <td>2023-01-10</td>
                 </tr>
             </tbody>
@@ -142,11 +152,5 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 </body>
 </html>
-

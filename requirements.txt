@@ -2,3 +2,4 @@ Django==4.2
 djangorestframework==3.14.0
 openpyxl==3.1.2
 pywin32==305
+xhtml2pdf==0.2.13
