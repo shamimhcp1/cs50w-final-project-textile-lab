@@ -19,7 +19,7 @@
             width: 100%;
             max-width: 794px; /* A4 width in pixels */
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
             background-color: #fff;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -28,17 +28,22 @@
 
         .invoice-header {
             text-align: center;
-            padding: 10px;
+            padding: 0px;
         }
 
         .invoice-details {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 12pt;
+            padding: 0px;
+            font-weight: bold;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 0px;
         }
 
         table, th, td {
@@ -47,15 +52,14 @@
         
         th, td {
             padding: 5px;
-            text-align: left;
+            text-align: center;
             font-size: 10pt;
         }
 
         .invoice-footer {
-            margin-top: 20px;
-            font-size: 10pt;
+            margin: 40px 0px 20px 0px;
+            padding-top: 20px;
         }
-
         /* Styles for printing */
         @media print {
             body {
@@ -91,7 +95,7 @@
                 <tr>
                     <th style="font-size: 12pt;">Buyer:</th>
                     <th style="font-size: 12pt;">LPP</th>
-                    <th colspan="2"> </th>
+                    <th colspan="2" style="text-align: center;"> </th>
                 </tr>
             </thead>
             
@@ -123,74 +127,117 @@
             </tbody>
         </table>
 
+        
         <!-- Test report section-->
+        <p> 1. Tear Strength, ISO-13937-2 </p>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Test Name</th>
-                    <th>Type</th>
-                    <th>Result</th>
+                    <th>Fabric Type</th>
+                    <th>Warp</th>
+                    <th>Weft</th>
                     <th>Requirements</th>
                     <th>Comments</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Tear Strength-->
                 <tr>
-                    <td rowspan="2">Tear Strength</td>
-                    <td>Raw Fabric</td>
-                    <td>2023-01-01</td>
+                    <td>Raw</td>
+                    <td>44.22</td>
+                    <td>35.31</td>
                     <td> - </td>
                     <td> - </td>
                 </tr>
                 <tr>
                     <td>Wash</td>
-                    <td>2023-01-01</td>
+                    <td>40.64</td>
+                    <td>31.55</td>
                     <td>20N</td>
-                    <td>Ok</td>
-                </tr>
-                <!-- Tensile Strength-->
-                <tr>
-                    <td rowspan="2">Tensile Strength</td>
-                    <td>Raw Fabric</td>
-                    <td>2023-01-01</td>
-                    <td> - </td>
-                    <td> - </td>
-                </tr>
-                <tr>
-                    <td>Wash</td>
-                    <td>2023-01-01</td>
-                    <td>250N</td>
-                    <td>Ok</td>
-                </tr>
-                <!-- CF to Rubbing-->
-                <tr>
-                    <td colspan="2">CF to Rubbing</td>
-                    <td>2023-01-10</td>
-                    <td>Dry:4, Wet:2</td>
                     <td>Ok</td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- Test Result -->
+        <!-- Tenslie report section-->
+        <p> 2. Tensile Strength, ISO-13934-2 </p>        
         <table class="table">
-            <tr style="font-weight: bold;">
-                <td>Result:</td>
-                <td colspan="4" style="text-align: center;">Result is Ok</td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Fabric Type</th>
+                    <th>Warp</th>
+                    <th>Weft</th>
+                    <th>Requirements</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Raw</td>
+                    <td>44.22</td>
+                    <td>35.31</td>
+                    <td> - </td>
+                    <td> - </td>
+                </tr>
+                <tr>
+                    <td>Wash</td>
+                    <td>40.64</td>
+                    <td>31.55</td>
+                    <td>20N</td>
+                    <td>Ok</td>
+                </tr>
+            </tbody>
         </table>
 
+        
+        <!-- Rubbing section-->
+        <p> 3. Colour Fastness to Rubbing, ISO-105X12 </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Dry</th>
+                    <th>Wet</th>
+                    <th>Requirements</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>4/5</td>
+                    <td>3/4</td>
+                    <td> Dry: 4, Wet: 2 </td>
+                    <td> Ok </td>
+                </tr>
+            </tbody>
+        </table>
+
+    
         </div>
 
+        <!-- Other Sections -->
+        <br/>
+        <div class="invoice-footer">
+            <table class="table">
+                <tr>
+                    <td colspan="2">
+                        <p> Result: <span style="color: red;"><u>Result is Ok</u></span> </p>
+                    </td>
+                </tr>
+            </table>
+            <table class="table">
+                <tr>
+                    <td>
+                        <p><u>Tested By</u></p>
+                        <p>Mehedi Hasan Shuvo</p>    
+                    </td>
+                    <td>
+                        <p><u>Checked By</u></p>
+                        <p>Ruhul Amin</p>   
+                    </td>
+                </tr>
+            </table>
+        </div>
         
 
-        <!-- Add more sections for other fields as needed -->
-
-        <div class="invoice-footer">
-            <p><strong>Result:</strong> Approved</p>
-            <p><strong>Create Date:</strong> 2023-01-15</p>
-        </div>
     </div>
 
 </body>
