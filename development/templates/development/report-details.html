@@ -28,7 +28,7 @@
 
         .invoice-header {
             text-align: center;
-            margin-bottom: 20px;
+            padding: 10px;
         }
 
         .invoice-details {
@@ -44,14 +44,16 @@
         table, th, td {
             border: 1px solid #ddd;
         }
-
+        
         th, td {
-            padding: 10px;
+            padding: 5px;
             text-align: left;
+            font-size: 10pt;
         }
 
         .invoice-footer {
             margin-top: 20px;
+            font-size: 10pt;
         }
 
         /* Styles for printing */
@@ -75,7 +77,7 @@
 <body>
 
     <div class="invoice">
-        <div class="invoice-header" style="padding: 10px;">
+        <div class="invoice-header">
             <!-- Add your logo here -->
             <img src="development/static/development/logo.png" alt="Logo" style="width: auto; height: 50px;">
             <h1 style="font-size: 30px; margin: 0;"><strong>TUSUKA LABORATORY</strong></h1>
@@ -83,66 +85,105 @@
 
         <div class="invoice-details">
 
+        <!-- Information section -->
         <table class="table">
+            <thead>
+                <tr>
+                    <th style="font-size: 12pt;">Buyer:</th>
+                    <th style="font-size: 12pt;">LPP</th>
+                    <th colspan="2"> </th>
+                </tr>
+            </thead>
             
             <tbody>
                 <tr>
-                    <td><strong>Buyer: </strong></td>
-                    <td><strong>LPP</strong></td>
-                    <td><strong>Receive Date:</strong></td>
-                    <td>2023-01-10</td>
-                </tr>
-                <tr>
                     <td><strong>Order No: </strong></td>
                     <td>N/A</td>
-                    <td><strong>Report Date:</strong></td>
+                    <td><strong>Receive Date:</strong></td>
                     <td>2023-01-10</td>
                 </tr>
                 <tr>
                     <td><strong>Style: </strong></td>
                     <td>1234s</td>
-                    <td><strong>Fabric Reference:</strong></td>
-                    <td>Td-4001</td>
+                    <td><strong>Report Date:</strong></td>
+                    <td>2023-01-10</td>
                 </tr>
                 <tr>
                     <td><strong>Color: </strong></td>
                     <td>55j</td>
+                    <td><strong>Fabric Reference:</strong></td>
+                    <td>Td-4001</td>
+                </tr>
+                <tr>
+                    <td><strong>Sample Type:</strong></td>
+                    <td>Dev</td>
                     <td><strong>Fabric Supplier:</strong></td>
                     <td>Texline</td>
                 </tr>
+            </tbody>
+        </table>
+
+        <!-- Test report section-->
+        <table class="table">
+            <thead>
                 <tr>
-                    <td><strong>Sample Type: </strong></td>
-                    <td>Dev</td>
+                    <th>Test Name</th>
+                    <th>Type</th>
+                    <th>Result</th>
+                    <th>Requirements</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Tear Strength-->
+                <tr>
+                    <td rowspan="2">Tear Strength</td>
+                    <td>Raw Fabric</td>
+                    <td>2023-01-01</td>
+                    <td> - </td>
+                    <td> - </td>
+                </tr>
+                <tr>
+                    <td>Wash</td>
+                    <td>2023-01-01</td>
+                    <td>20N</td>
+                    <td>Ok</td>
+                </tr>
+                <!-- Tensile Strength-->
+                <tr>
+                    <td rowspan="2">Tensile Strength</td>
+                    <td>Raw Fabric</td>
+                    <td>2023-01-01</td>
+                    <td> - </td>
+                    <td> - </td>
+                </tr>
+                <tr>
+                    <td>Wash</td>
+                    <td>2023-01-01</td>
+                    <td>250N</td>
+                    <td>Ok</td>
+                </tr>
+                <!-- CF to Rubbing-->
+                <tr>
+                    <td colspan="2">CF to Rubbing</td>
+                    <td>2023-01-10</td>
+                    <td>Dry:4, Wet:2</td>
+                    <td>Ok</td>
                 </tr>
             </tbody>
+        </table>
+
+        <!-- Test Result -->
+        <table class="table">
+            <tr style="font-weight: bold;">
+                <td>Result:</td>
+                <td colspan="4" style="text-align: center;">Result is Ok</td>
+            </tr>
         </table>
 
         </div>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sample Type</th>
-                    <th>Receive Date</th>
-                    <th>Report Date</th>
-                    <th>Report Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>T-shirt</td>
-                    <td>2023-01-01</td>
-                    <td>2023-01-10</td>
-                    <td>2023-01-10</td>
-                </tr>
-                <tr>
-                    <td>T-shirt 2</td>
-                    <td>2023-01-01</td>
-                    <td>2023-01-10</td>
-                    <td>2023-01-10</td>
-                </tr>
-            </tbody>
-        </table>
+        
 
         <!-- Add more sections for other fields as needed -->
 
