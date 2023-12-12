@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from .models import User, Buyer, DevFormat, DevRequirement, DevReport
+from .models import User, Buyer, DevRequirement, DevReport
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,11 +10,6 @@ class UserSerializer(serializers.ModelSerializer):
 class BuyerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyer
-        fields = ('__all__')
-
-class DevFormatSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DevFormat
         fields = ('__all__')
 
 class DevRequirementSerializer(serializers.ModelSerializer):

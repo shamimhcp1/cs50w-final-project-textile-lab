@@ -7,29 +7,8 @@ from rest_framework import serializers, status
 from .models import Buyer, DevReport
 from .serializers import BuyerSerializer, DevReportSerializer
 from .forms import DevReportForm
-from .utils import generate_report
+from .utils import render_to_pdf
 
-from django.templatetags.static import static
-# dev_format_url = static('app/format/dev_format.xlsx')
-
-from io import BytesIO
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-
-
-def render_to_pdf(template_src, context_dict={}):
-    template = get_template(template_src)
-    html = template.render(context_dict)
-    # Additional options for pisa
-    options = {
-        'enable-local-file-access': None,  # Allow access to local files (images, stylesheets)
-        'quiet': None,  # Suppress pisa output for cleaner logs
-    }
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result, encoding='UTF-8', **options)
-    if not pdf.err:
-        return result.getvalue()
-    return None
 
 data = {
     "company": "Dennnis Ivanov Company",
@@ -51,8 +30,10 @@ def pdf_download(request):
         return response
     return HttpResponse("Error generating PDF", status=500)
 
+
 def pdf_template(request):
     return render(request, 'development/report-details.html', data)
+
 
 def pdf_view(request):
     pdf = render_to_pdf('development/report-details.html', data)
@@ -60,7 +41,6 @@ def pdf_view(request):
         response = HttpResponse(pdf, content_type='application/pdf')
         return response
     return HttpResponse("Error generating PDF", status=500)
-
 
 
 @api_view(['GET'])
@@ -77,8 +57,6 @@ def ApiOverview(request):
     return Response(api_urls)
 
 # Report List
-
-
 @api_view(['GET'])
 def dev_report_list_view(request):
     reports = DevReport.objects.all()
@@ -96,19 +74,12 @@ def dev_report_create(request):
             dev_report.created_by = request.user
             dev_report.save()
 
-            # Generate the report
-            message = generate_report(dev_report)
-            if message == "Success":
-                return HttpResponse("Success")
-            else:
-                return HttpResponse(f"Error: {message}")
-
-            # return redirect('dev-report-create')  # Redirect to the same page after submission
+            return redirect('dev-report-create')  # Redirect to the same page after submission
 
     else:
         form = DevReportForm()
 
-    return render(request, '/development/index.html', {
+    return render(request, 'development/index.html', {
         'form': form
     })
 
