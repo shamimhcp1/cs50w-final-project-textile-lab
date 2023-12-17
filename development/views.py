@@ -9,6 +9,8 @@ from .serializers import BuyerSerializer, DevReportSerializer
 from .forms import DevReportForm
 from .utils import render_to_pdf
 
+def index(request):
+    return render(request, 'development/index.html')
 
 data = {
     "company": "Dennnis Ivanov Company",
@@ -79,7 +81,7 @@ def dev_report_create(request):
     else:
         form = DevReportForm()
 
-    return render(request, 'development/index.html', {
+    return render(request, 'development/report-create.html', {
         'form': form
     })
 

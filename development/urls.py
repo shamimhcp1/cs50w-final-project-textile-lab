@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
 
+    path('', views.index, name='index'),
+    
     path('dev-report/create', views.dev_report_create, name='dev-report-create'),
     
     path('pdf-template', views.pdf_template, name='pdf-template'),
