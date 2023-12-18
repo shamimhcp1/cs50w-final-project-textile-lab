@@ -103,6 +103,26 @@
                 
               </ul>
             </li>
+            <!-- Requirements -->
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                  <i class="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
+                  <div data-i18n="Misc">Requirements</div>
+                </a>
+                <ul class="menu-sub">
+                  <li class="menu-item">
+                    <a href="{% url 'add-requirement' %}" class="menu-link">
+                      <div data-i18n="Error">Add</div>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="{% url 'manage-requirements' %}" class="menu-link">
+                      <div data-i18n="Under Maintenance">Manage Req's</div>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              
             <!-- Reports -->
             <li class="menu-item">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -111,7 +131,7 @@
               </a>
               <ul class="menu-sub">
                 <li class="menu-item">
-                  <a href="{% url 'dev-report-create' %}" class="menu-link">
+                  <a href="{% url 'create-report' %}" class="menu-link">
                     <div data-i18n="Error">Create</div>
                   </a>
                 </li>
@@ -120,40 +140,7 @@
                     <div data-i18n="Under Maintenance">Manage Reports</div>
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="{% url 'dev-report-create' %}" class="menu-link">
-                    <div data-i18n="Error">Today's</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="{% url 'manage-reports' %}" class="menu-link">
-                    <div data-i18n="Under Maintenance">Passed</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="{% url 'manage-reports' %}" class="menu-link">
-                    <div data-i18n="Under Maintenance">Failed</div>
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <!-- Requirements -->
-            <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
-                <div data-i18n="Misc">Requirements</div>
-              </a>
-              <ul class="menu-sub">
-                <li class="menu-item">
-                  <a href="pages-misc-error.html" class="menu-link">
-                    <div data-i18n="Error">Add</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="pages-misc-under-maintenance.html" class="menu-link">
-                    <div data-i18n="Under Maintenance">Manage Req's</div>
-                  </a>
-                </li>
+                
               </ul>
             </li>
             
@@ -167,7 +154,7 @@
               </a>
               <ul class="menu-sub">
                 <li class="menu-item">
-                  <a href="pages-account-settings-account.html" class="menu-link">
+                  <a href="{% url 'add-user' %}" class="menu-link">
                     <div data-i18n="Account">Add</div>
                   </a>
                 </li>
@@ -176,20 +163,16 @@
                     <div data-i18n="Notifications">Manage Users</div>
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="{% url 'manage-users' %}" class="menu-link">
-                    <div data-i18n="Notifications">Pending</div>
-                  </a>
-                </li>
+                
               </ul>
             </li>
             <li class="menu-item">
               <a
-                href="https://github.com/themeselection/materio-bootstrap-html-admin-template-free/issues"
+                href="https://github.com/shamimhcp1"
                 target="_blank"
                 class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-lifebuoy"></i>
-                <div data-i18n="Support">About Us</div>
+                <div data-i18n="Support">About</div>
               </a>
             </li>
             <li class="menu-item">
@@ -265,14 +248,22 @@
                       <div class="dropdown-divider my-1"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="#">
+                      <a class="dropdown-item" href="{% url 'my-profile' %}">
                         <i class="mdi mdi-account-outline me-1 mdi-20px"></i>
                         <span class="align-middle">My Profile</span>
                       </a>
                     </li>
-                    
                     <li>
-                      <a class="dropdown-item" href="javascript:void(0);">
+                        <a class="dropdown-item" href="{% url 'change-password' %}">
+                          <i class="mdi mdi-key-outline me-1 mdi-20px"></i>
+                          <span class="align-middle">Change Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="dropdown-divider my-1"></div>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'logout' %}">
                         <i class="mdi mdi-power me-1 mdi-20px"></i>
                         <span class="align-middle">Log Out</span>
                       </a>
