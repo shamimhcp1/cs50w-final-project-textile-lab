@@ -13,74 +13,125 @@
                 <small class="text-muted float-end">Tusuka-Development</small>
               </div>
               <div class="card-body">
-                <form>
+                <form method="post" action="">
+                  {% csrf_token %}
+                  <!-- Buyer -->
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="basic-default-name">Name</label>
-                    <div class="col-sm-10">
-                      <input type="text" class="form-control" id="basic-default-name" placeholder="John Doe" />
+                    <label class="col-sm-2 col-form-label" for="buyer-name">Buyer</label>
+                    <div class="col-sm-4">
+                      <select id="buyer-name" class="form-select">
+                        <option>--</option>
+                        <option value="1">LPP</option>
+                        <option value="2">Group Dynamite</option>
+                        <option value="3">Bonobo</option>
+                      </select>
+                    </div>
+                    <!-- Requirements -->
+                    <label class="col-sm-2 col-form-label" for="requirement">Requirements</label>
+                    <div class="col-sm-4">
+                      <select id="requirement" class="form-select">
+                        <option>--</option>
+                        <option value="1">Lt/Mid</option>
+                        <option value="2">Dark</option>
+                        <option value="3">Brut</option>
+                      </select>
                     </div>
                   </div>
+                  <!-- Date -->
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="html5-date-input">Date</label>
-                    <div class="col-sm-10">
-                      <input type="date" class="form-control" id="html5-date-input"/>
+                    <label class="col-sm-2 col-form-label" for="receive-date">Receive Date</label>
+                    <div class="col-sm-4">
+                      <input type="date" class="form-control" id="receive-date"/>
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="report-date">Report Date</label>
+                    <div class="col-sm-4">
+                      <input type="date" class="form-control" id="report-date"/>
                     </div>
                   </div>
+                  <!-- Style -->
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="basic-default-company">Company</label>
+                    <label class="col-sm-2 col-form-label" for="basic-default-name">Style</label>
                     <div class="col-sm-10">
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="basic-default-company"
-                        placeholder="ACME Inc." />
+                      <input type="text" class="form-control" id="basic-default-name" placeholder="Style" />
                     </div>
                   </div>
+                  <!-- Color -->
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="basic-default-email">Email</label>
-                    <div class="col-sm-10">
-                      <div class="input-group input-group-merge">
-                        <input
-                          type="text"
-                          id="basic-default-email"
-                          class="form-control"
-                          placeholder="john.doe"
-                          aria-label="john.doe"
-                          aria-describedby="basic-default-email2" />
-                        <span class="input-group-text" id="basic-default-email2">@example.com</span>
-                      </div>
-                      <div class="form-text">You can use letters, numbers & periods</div>
+                    <label class="col-sm-2 col-form-label" for="color">Color</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="color" placeholder="Color" />
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="sample-type">Sample Type</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="sample-type" placeholder="Sample Type" />
                     </div>
                   </div>
+                  <!-- Fabric Reference -->
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="basic-default-phone">Phone No</label>
-                    <div class="col-sm-10">
-                      <input
-                        type="text"
-                        id="basic-default-phone"
-                        class="form-control phone-mask"
-                        placeholder="658 799 8941"
-                        aria-label="658 799 8941"
-                        aria-describedby="basic-default-phone" />
+                    <label class="col-sm-2 col-form-label" for="fabric-ref">Fabric Reference</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="fabric-ref" placeholder="Fabric Reference" />
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="supplier">Supplier</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="supplier" placeholder="Supplier" />
                     </div>
                   </div>
+                  
+                 <!-- Rubbing -->
+                 <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label" for="dry-rubbing">Dry Rubbing</label>
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control" id="dry-rubbing" placeholder="Dry Rubbing" />
+                  </div>
+                  <label class="col-sm-2 col-form-label" for="wet-rubbing">Wet Rubbing</label>
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control" id="wet-rubbing" placeholder="Wet Rubbing" />
+                  </div>
+                </div>
+                  <!-- Raw Tear -->
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label" for="basic-default-message">Message</label>
-                    <div class="col-sm-10">
-                      <textarea
-                        id="basic-default-message"
-                        class="form-control"
-                        placeholder="Hi, Do you have a moment to talk Joe?"
-                        aria-label="Hi, Do you have a moment to talk Joe?"
-                        aria-describedby="basic-icon-default-message2"></textarea>
+                    <label class="col-sm-2 col-form-label" for="raw-tear-warp">Raw Tear Warp</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="raw-tear-warp" placeholder="Raw Tear Warp" />
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="raw-tear-weft">Raw Tear Weft</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="raw-tear-weft" placeholder="Raw Tear Warp" />
                     </div>
                   </div>
+                  <!-- Wash Tear -->
+                  <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="wash-tear-warp">Wash Tear Warp</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="wash-tear-warp" placeholder="Wash Tear Warp" />
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="wash-tear-weft">Wash Tear Weft</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="wash-tear-weft" placeholder="Wash Tear Weft" />
+                    </div>
+                  </div>
+                  <!-- Tensile -->
+                  <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="tensile-warp">Tensile Warp</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="tensile-warp" placeholder="Tensile Warp" />
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="tensile-weft">Tensile Weft</label>
+                    <div class="col-sm-4">
+                      <input type="text" class="form-control" id="tensile-weft" placeholder="Tensile Weft" />
+                    </div>
+                  </div>
+                  <!-- Save -->
                   <div class="row justify-content-end">
                     <div class="col-sm-10">
                       <button type="submit" class="btn btn-primary">Save</button>
+                      <button type="submit" class="btn btn-info">Save & Copy</button>
+                      <button type="submit" class="btn btn-success">Save & New</button>
                     </div>
                   </div>
                 </form>
+               
               </div>
             </div>
         </div>

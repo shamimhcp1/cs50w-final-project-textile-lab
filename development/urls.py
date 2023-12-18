@@ -4,6 +4,10 @@ from . import views
 urlpatterns = [
 
     path('', views.index, name='index'),
+    path('manage-users', views.manage_users, name='manage-users'),
+    path('manage-reports', views.manage_reports, name='manage-reports'),
+    path('buyer-add', views.buyer_add, name='buyer-add'),
+    path('buyer-manage', views.buyer_manage, name='buyer-manage'),
     
     path('dev-report/create', views.dev_report_create, name='dev-report-create'),
     

@@ -92,6 +92,19 @@ def dev_report_create(request):
 
     # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+def manage_users(request):
+    return render(request, 'development/manage-users.html')
+
+def manage_reports(request):
+    return render(request, 'development/manage-reports.html')
+
+def buyer_add(request):
+    return render(request, 'development/buyer-add.html')
+
+def buyer_manage(request):
+    return render(request, 'development/buyer-manage.html')
+
+
 
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def dev_report_detail_view(request, pk):
