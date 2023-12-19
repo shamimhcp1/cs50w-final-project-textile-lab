@@ -19,14 +19,23 @@
                         <th class="text-truncate">SL</th>
                         <th class="text-truncate">Buyer</th>
                         <th class="text-truncate">Requirements Label</th>
+                        <th class="text-truncate">Status</th>
                         <th class="text-truncate">Action</th>
                       </tr>
                     </thead>
                     <tbody>
+                      {% for requirement in requirements%}
                       <tr>
-                        <td class="text-truncate">1</td>
-                        <td class="text-truncate">Group Dynamite</td>
-                        <td class="text-truncate">Lt/Mid</td>
+                        <td class="text-truncate">{{ forloop.counter }}</td>
+                        <td class="text-truncate">{{ requirement.buyer }}</td>
+                        <td class="text-truncate">{{ requirement.requirement_label }}</td>
+                        <td>
+                          {% if requirement.is_active %}
+                          <span class="badge bg-label-success rounded-pill">Active</span>
+                          {% else %}
+                          <span class="badge bg-label-warning rounded-pill">Pending</span>
+                          {% endif %}
+                        </td>
                         <td>
                           <div class="dropdown">
                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -43,106 +52,7 @@
                           </div>
                         </td>
                       </tr>
-                      <tr>
-                        <td class="text-truncate">2</td>
-                        <td class="text-truncate">Group Dynamite</td>
-                        <td class="text-truncate">Dark</td>
-                        <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="mdi mdi-dots-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate">3</td>
-                        <td class="text-truncate">Bonobo</td>
-                        <td class="text-truncate">Brut</td>
-                        <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="mdi mdi-dots-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate">4</td>
-                        <td class="text-truncate">LPP</td>
-                        <td class="text-truncate">Dev</td>
-                        <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="mdi mdi-dots-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate">5</td>
-                        <td class="text-truncate">ECI</td>
-                        <td class="text-truncate">Dev</td>
-                        <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="mdi mdi-dots-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate">6</td>
-                        <td class="text-truncate">Green Point</td>
-                        <td class="text-truncate">Dev</td>
-                        <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="mdi mdi-dots-vertical"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
-                              >
-                              <a class="dropdown-item" href="javascript:void(0);"
-                                ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                              >
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
+                      {% endfor %}
                     </tbody>
                   </table>
                 </div>

@@ -1,6 +1,5 @@
 const app = document.getElementById('app');
 
-
 function Header(props) {
     return (<h1>{props.title ? props.title : 'Default Title'}</h1>);
 }

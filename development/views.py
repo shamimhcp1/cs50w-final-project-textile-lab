@@ -105,7 +105,10 @@ def add_requirement(request):
 
 @login_required(login_url='login')
 def manage_requirements(request):
-    return render(request, 'development/manage-requirements.html')
+    requirements = DevRequirement.objects.all()
+    return render(request, 'development/manage-requirements.html', {
+        'requirements' : requirements
+    })
 
 
 # reports
