@@ -13,6 +13,7 @@ class User(AbstractUser):
         ('merchandiser', 'Merchandiser'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
+    is_active = models.BooleanField(default=False)
 
     # Adding related_name to avoid clashes with the default auth.User model
     groups = models.ManyToManyField(Group, related_name='custom_user_set')
@@ -23,6 +24,7 @@ class User(AbstractUser):
 
 class Buyer(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -42,6 +44,7 @@ class DevRequirement(models.Model):
     tensile_weft = models.CharField(max_length=20, null=True, blank=True)
     tensile_method = models.CharField(max_length=100, null=True, blank=True)
     tensile_text = models.CharField(max_length=100, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.buyer.name}, {self.requirement_label}"
