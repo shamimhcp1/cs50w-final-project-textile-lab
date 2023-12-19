@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from .models import Buyer, DevReport, User
+from .models import Buyer, DevReport, User, DevRequirement
 from .serializers import BuyerSerializer, DevReportSerializer
 from .forms import DevReportForm
 from .utils import render_to_pdf
@@ -56,20 +56,14 @@ def pdf_view(request):
 # @api_view(['POST'])
 @login_required(login_url='login')
 def create_report(request):
+    buyers = Buyer.objects.filter(is_active=1).order_by('name')
+    requirements = DevRequirement.objects.filter(is_active=1).order_by('requirement_label')
     if request.method == 'POST':
-        form = DevReportForm(request.POST)
-        if form.is_valid():
-            dev_report = form.save(commit=False)
-            dev_report.created_by = request.user
-            dev_report.save()
-
-            return redirect('dev-report-create')  # Redirect to the same page after submission
-
-    else:
-        form = DevReportForm()
+        return HttpResponse(request)
 
     return render(request, 'development/report-create.html', {
-        'form': form
+        'buyers' : buyers,
+        'requirements' : requirements
     })
 
     # serializer = DevReportSerializer(data=request.data)
@@ -83,16 +77,31 @@ def create_report(request):
 # buyer
 @login_required(login_url='login')
 def buyer_add(request):
+    if request.method == "POST":
+        name = request.POST["name"]
+        is_active = request.POST["is_active"]
+
+        buyer = Buyer(name=name, is_active=is_active)
+        buyer.save()
+
+        return redirect('buyer-manage')
+
     return render(request, 'development/buyer-add.html')
 
 @login_required(login_url='login')
 def buyer_manage(request):
-    return render(request, 'development/buyer-manage.html')
+    buyers = Buyer.objects.all()
+    return render(request, 'development/buyer-manage.html', {
+        'buyers' : buyers
+    })
 
 # requirements
 @login_required(login_url='login')
 def add_requirement(request):
-    return render(request, 'development/add-requirement.html')
+    buyers = Buyer.objects.all()
+    return render(request, 'development/add-requirement.html', {
+        'buyers' : buyers
+    })
 
 @login_required(login_url='login')
 def manage_requirements(request):
@@ -116,7 +125,10 @@ def change_password(request):
 # users
 @login_required(login_url='login')
 def manage_users(request):
-    return render(request, 'development/manage-users.html')
+    users = User.objects.all()  # Retrieve all user objects
+    return render(request, 'development/manage-users.html', {
+        'users' : users
+    })
 
 @login_required(login_url='login')
 def add_user(request):
@@ -242,12 +254,13 @@ def logout_view(request):
 
 
 def register(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("index"))
 
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
+        role = request.POST.get("role", "")
+        is_active = request.POST.get("is_active", 0)
+
 
         # Ensure password matches confirmation
         password = request.POST["password"]
@@ -260,14 +273,22 @@ def register(request):
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
+            user.role = role
+            user.is_active = is_active
             user.save()
         except IntegrityError:
             return render(request, "development/register.html", {
                 "message": "Username already taken."
             })
-        login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        if not request.user.is_authenticated:
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return HttpResponseRedirect(reverse("manage-users"))
     else:
+        if request.user.is_authenticated and not request.user.is_superuser:
+            return HttpResponseRedirect(reverse("index"))
+        
         return render(request, "development/register.html")
 
 

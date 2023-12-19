@@ -6,11 +6,8 @@ from django.utils import timezone
 # Create your models here.
 class User(AbstractUser):
     ROLE_CHOICES = [
-        ('manager', 'Manager'),
         ('incharge', 'Incharge'),
         ('coordinator', 'Coordinator'),
-        ('technician', 'Technician'), 
-        ('merchandiser', 'Merchandiser'),
     ]
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_active = models.BooleanField(default=False)

@@ -16,54 +16,52 @@
               <small class="text-muted float-end">Tusuka-Development</small>
             </div>
             <div class="card-body">
-              <form>
+              <form action="{% url 'register' %}" method="POST">
+                {% csrf_token %}
                 <div class="form-floating form-floating-outline mb-4">
-                    <select id="role" class="form-select">
+                    <select id="role" class="form-select" name="role">
                         <option>-Select Role-</option>
-                        <option value="1">Manager</option>
-                        <option value="2">Incharge</option>
-                        <option value="3">Coordinator</option>
-                        <option value="1">Technician</option>
-                        <option value="2">Merchandiser</option>
+                        <option value="incharge">Incharge</option>
+                        <option value="coordinator">Coordinator</option>
                     </select>
                     <label for="role">Role</label>
                   </div>
                 
                 <div class="form-floating form-floating-outline mb-4">
-                    <input type="text" class="form-control" id="basic-default-fullname" placeholder="username" />
-                    <label for="basic-default-fullname">Username</label>
+                    <input type="text" class="form-control" name="username" id="username" placeholder="username" />
+                    <label for="username">Username</label>
                 </div>
                 <div class="form-floating form-floating-outline mb-4">
-                    <input type="email" class="form-control" id="basic-default-fullname" placeholder="email" />
-                    <label for="basic-default-fullname">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="email" />
+                    <label for="email">Email</label>
                   </div>
                 <div class="form-floating form-floating-outline mb-4">
-                    <input type="password" class="form-control" id="basic-default-fullname" placeholder="Password" />
-                    <label for="basic-default-fullname">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="password" />
+                    <label for="Password">Password</label>
                 </div>
                 <div class="form-floating form-floating-outline mb-4">
-                    <input type="password" class="form-control" id="basic-default-fullname" placeholder="Confirm Password" />
-                    <label for="basic-default-fullname">Confirm Password</label>
+                    <input type="password" class="form-control" name="confirmation" id="confirmation" placeholder="Confirm Password" />
+                    <label for="confirmation">Confirm Password</label>
                 </div>
                 <div class="form-floating form-floating-outline mb-4">
                     <div class="form-check mt-3">
                         <input
-                          name="default-radio-1"
+                          name="is_active"
                           class="form-check-input"
                           type="radio"
-                          value=""
-                          id="defaultRadio1"
+                          value="1"
+                          id="is_active_1"
                           checked />
-                        <label class="form-check-label" for="defaultRadio1"> Active </label>
+                        <label class="form-check-label" for="is_active_1"> Active </label>
                       </div>
                       <div class="form-check">
                         <input
-                          name="default-radio-1"
+                          name="is_active"
                           class="form-check-input"
                           type="radio"
-                          value=""
-                          id="defaultRadio2" />
-                        <label class="form-check-label" for="defaultRadio2"> Deactive </label>
+                          value="0"
+                          id="is_active_0" />
+                        <label class="form-check-label" for="is_active_0"> Deactive </label>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Register</button>
