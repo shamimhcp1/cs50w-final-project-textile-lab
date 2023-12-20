@@ -1,21 +1,359 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TextileLab Report Builder</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'development/styles.css' %}" rel="stylesheet">
-        <script src="https://kit.fontawesome.com/a739db8c00.js" crossorigin="anonymous"></script>
-        
-    </head>
-  <body>
-    {% block content %}
-    {% endblock %}
 
+<html
+  lang="en"
+  class="light-style layout-menu-fixed layout-compact"
+  dir="ltr"
+  data-theme="theme-default"
+  data-assets-path="{% static 'development/assets/' %}"
+  data-template="vertical-menu-template-free">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title>Textile-Lab Report Builder</title>
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'development/assets/img/favicon/favicon.ico' %}" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&ampdisplay=swap"
+      rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'development/assets/vendor/fonts/materialdesignicons.css' %}" />
+
+    <!-- Menu waves for no-customizer fix -->
+    <link rel="stylesheet" href="{% static 'development/assets/vendor/libs/node-waves/node-waves.css' %}" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'development/assets/vendor/css/core.css' %}" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="{% static 'development/assets/vendor/css/theme-default.css' %}" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="{% static 'development/assets/css/demo.css' %}" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{% static 'development/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'development/assets/vendor/libs/apex-charts/apex-charts.css' %}" />
+
+    <!-- Page CSS -->
+
+    <!-- Helpers -->
+    <script src="{% static 'development/assets/vendor/js/helpers.js' %}"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{% static 'development/assets/js/config.js' %}"></script>
+  </head>
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+          <div class="app-brand demo">
+            <a href="{% url 'index' %}" class="app-brand-link">
+              <span class="app-brand-text demo menu-text fw-semibold ms-2">Tusuka-Lab</span>
+            </a>
+
+            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+              <i class="mdi menu-toggle-icon d-xl-block align-middle mdi-20px"></i>
+            </a>
+          </div>
+
+          <div class="menu-inner-shadow"></div>
+
+          <ul class="menu-inner py-1">
+            <!-- Dashboard -->
+            <li class="menu-item active open">
+              <a
+                href="{% url 'index' %}"
+                class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-home-outline"></i>
+                <div data-i18n="Email">Dashboard</div>
+              </a>
+            </li>
+            <!-- Development -->
+            <li class="menu-header fw-medium mt-4"><span class="menu-header-text">Development</span></li>
+            <!-- Buyers -->
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons mdi mdi-star-outline"></i>
+                <div data-i18n="Authentications">Buyers</div>
+              </a>
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="{% url 'buyer-add' %}" class="menu-link">
+                    <div data-i18n="Basic">Add</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{% url 'buyer-manage' %}" class="menu-link">
+                    <div data-i18n="Basic">Manage Buyers</div>
+                  </a>
+                </li>
+                
+              </ul>
+            </li>
+            <!-- Requirements -->
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                  <i class="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
+                  <div data-i18n="Misc">Requirements</div>
+                </a>
+                <ul class="menu-sub">
+                  <li class="menu-item">
+                    <a href="{% url 'add-requirement' %}" class="menu-link">
+                      <div data-i18n="Error">Add</div>
+                    </a>
+                  </li>
+                  <li class="menu-item">
+                    <a href="{% url 'manage-requirements' %}" class="menu-link">
+                      <div data-i18n="Under Maintenance">Manage Req's</div>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              
+            <!-- Reports -->
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons mdi mdi-form-select"></i>
+                <div data-i18n="Misc">Reports</div>
+              </a>
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="{% url 'create-report' %}" class="menu-link">
+                    <div data-i18n="Error">Create</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{% url 'manage-reports' %}" class="menu-link">
+                    <div data-i18n="Under Maintenance">Manage Reports</div>
+                  </a>
+                </li>
+                
+              </ul>
+            </li>
+            
+            <!-- Misc -->
+            <li class="menu-header fw-medium mt-4"><span class="menu-header-text">Misc</span></li>
+            <!-- Users -->
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
+                <div data-i18n="Account Settings">Users</div>
+              </a>
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="{% url 'add-user' %}" class="menu-link">
+                    <div data-i18n="Account">Add</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{% url 'manage-users' %}" class="menu-link">
+                    <div data-i18n="Notifications">Manage Users</div>
+                  </a>
+                </li>
+                
+              </ul>
+            </li>
+            <li class="menu-item">
+              <a
+                href="https://github.com/shamimhcp1"
+                target="_blank"
+                class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-lifebuoy"></i>
+                <div data-i18n="Support">About Us</div>
+              </a>
+            </li>
+            
+            <!-- Misc -->
+          </ul>
+        </aside>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <!-- Navbar -->
+
+          <nav
+            class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+            id="layout-navbar">
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+              <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                <i class="mdi mdi-menu mdi-24px"></i>
+              </a>
+            </div>
+
+            <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+              <!-- Search -->
+              <div class="navbar-nav align-items-center">
+                <div class="nav-item d-flex align-items-center">
+                  <i class="mdi mdi-magnify mdi-24px lh-0"></i>
+                  <input
+                    type="text"
+                    class="form-control border-0 shadow-none bg-body"
+                    placeholder="Search..."
+                    aria-label="Search..." />
+                </div>
+              </div>
+              <!-- /Search -->
+
+              <ul class="navbar-nav flex-row align-items-center ms-auto">
+
+                <!-- User -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                  <a
+                    class="nav-link dropdown-toggle hide-arrow p-0"
+                    href="javascript:void(0);"
+                    data-bs-toggle="dropdown">
+                    <div class="avatar avatar-online">
+                      <img src="{% static 'development/assets/img/avatars/1.png' %}" alt class="w-px-40 h-auto rounded-circle" />
+                    </div>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end mt-3 py-2">
+                    <li>
+                      <a class="dropdown-item pb-2 mb-1" href="#">
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0 me-2 pe-1">
+                            <div class="avatar avatar-online">
+                              <img src="{% static 'development/assets/img/avatars/1.png' %}" alt class="w-px-40 h-auto rounded-circle" />
+                            </div>
+                          </div>
+                          <div class="flex-grow-1">
+                            <h6 class="mb-0">{{ request.user.username }}</h6>
+                            
+                            <small class="text-muted">
+                              {% if request.user.is_superuser %}
+                              superuser
+                              {% else %}
+                              {{ request.user.role }}
+                              {% endif %}
+                            </small>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="dropdown-divider my-1"></div>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'my-profile' %}">
+                        <i class="mdi mdi-account-outline me-1 mdi-20px"></i>
+                        <span class="align-middle">My Profile</span>
+                      </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'change-password' %}">
+                          <i class="mdi mdi-key-outline me-1 mdi-20px"></i>
+                          <span class="align-middle">Change Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="dropdown-divider my-1"></div>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'logout' %}">
+                        <i class="mdi mdi-power me-1 mdi-20px"></i>
+                        <span class="align-middle">Log Out</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <!--/ User -->
+              </ul>
+            </div>
+          </nav>
+
+          <!-- / Navbar -->
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+
+            {% block content %}
+            {% endblock %}
+
+            <!-- / Content -->
+
+            <!-- Footer -->
+            <footer class="content-footer footer bg-footer-theme">
+              <div class="container-xxl">
+                <div
+                  class="footer-container d-flex align-items-center justify-content-between py-3 flex-md-row flex-column">
+                  <div class="text-body mb-2 mb-md-0">
+                    ©
+                    <script>
+                      document.write(new Date().getFullYear());
+                    </script>,
+                    made with <span class="text-danger"><i class="tf-icons mdi mdi-heart"></i></span> by: <a href="https://github.com/shamimhcp1" class="footer-link me-3" target="_blank">Shamim Hossain</a>
+                    
+                  </div>
+                  <div class="text-body d-lg-inline-block">
+                    Theme design by:
+                    <a href="https://themeselection.com" target="_blank" class="footer-link fw-medium"
+                      >ThemeSelection</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+    <div class="buy-now">
+      <a
+        href="https://github.com/shamimhcp1"
+        target="_blank"
+        class="btn btn-danger btn-buy-now"
+        >Shamim Hossain</a
+      >
+    </div>
+
+    <!-- Core JS -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="{% static 'development/assets/vendor/libs/jquery/jquery.js' %}"></script>
+    <script src="{% static 'development/assets/vendor/libs/popper/popper.js' %}"></script>
+    <script src="{% static 'development/assets/vendor/js/bootstrap.js' %}"></script>
+    <script src="{% static 'development/assets/vendor/libs/node-waves/node-waves.js' %}"></script>
+    <script src="{% static 'development/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'development/assets/vendor/js/menu.js' %}"></script>
+
+    <!-- endbuild -->
+
+    <!-- Vendors JS -->
+    <script src="{% static 'development/assets/vendor/libs/apex-charts/apexcharts.js' %}"></script>
+
+    <!-- Main JS -->
+    <script src="{% static 'development/assets/js/main.js' %}"></script>
+
+    <!-- Page JS -->
+    <script src="{% static 'development/assets/js/dashboards-analytics.js' %}"></script>
+
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <!-- React JS -->
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
