@@ -9,23 +9,25 @@ urlpatterns = [
     path("forgot-password", views.forgot_password, name="forgot-password"), 
     
     # buyer
-    path('buyer-add', views.buyer_add, name='buyer-add'),
-    path('buyer-manage', views.buyer_manage, name='buyer-manage'),
+    path('create-buyer', views.create_buyer, name='create-buyer'),
+    path('manage-buyer', views.manage_buyer, name='manage-buyer'),
+    # delete buyer
+    path('delete-buyer', views.delete_buyer, name='delete-buyer'),
 
     # requirements
-    path('manage-requirements', views.manage_requirements, name='manage-requirements'),
-    path('add-requirement', views.add_requirement, name='add-requirement'),
+    path('manage-requirement', views.manage_requirement, name='manage-requirement'),
+    path('create-requirement', views.create_requirement, name='create-requirement'),
     
     # report
     path('create-report', views.create_report, name='create-report'),
-    path('manage-reports', views.manage_reports, name='manage-reports'),
+    path('manage-report', views.manage_report, name='manage-report'),
     
     # users
-    path('manage-users', views.manage_users, name='manage-users'),
-    path('add-user', views.add_user, name='add-user'),
+    path('manage-user', views.manage_user, name='manage-user'),
+    path('create-user', views.create_user, name='create-user'),
     
     # profile
-    path('my-profile', views.my_profile, name='my-profile'),
+    path('profile-view', views.profile_view, name='profile-view'),
     path('change-password', views.change_password, name='change-password'),
     
     # pdf / Excel

@@ -1,6 +1,6 @@
 const app = document.getElementById('app');
 
-const RegisterUser = () => {
+const CreateUser = () => {
     return (
         <div class="col-md-12 col-lg-6">
             <div class="card mb-4">
@@ -154,7 +154,7 @@ const ChangePassword = () => {
     );
 };
 
-const UserProfile = () => {
+const ProfileView = () => {
     return (
         <div class="col-md-12 col-lg-12">
             <div class="card mb-4">
@@ -511,7 +511,46 @@ const RecentReportWidget = () => {
     );
 };
 
-const CreateBuyer = () => {
+    
+const CreateBuyer = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
+
+    // submit the below form with fetch
+    const submitCreateBuyerForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('createBuyerForm');
+        const formData = new FormData(form);
+        
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/create-buyer', {
+            method: 'POST',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to buyer list page');
+                    // redirect to buyer list page
+                    setCurrentView('manage-buyer'); // Update currentView
+                    setActiveMenuItem('manage-buyer')
+                    setMessage(data.message)
+                } else {
+                    console.log('Failed to create buyer. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
 
     return (
         <div className="col-md-12 col-lg-6">
@@ -521,7 +560,7 @@ const CreateBuyer = () => {
                     <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
-                    <form method="POST" action="{% url 'buyer-add' %}">
+                    <form method="POST" action="" id="createBuyerForm">
                         <div className="form-floating form-floating-outline mb-4">
                             <input type="text" className="form-control" name="name" id="name" placeholder="Buyer Name" />
                             <label htmlFor="name">Buyer Name</label>
@@ -549,7 +588,7 @@ const CreateBuyer = () => {
                                 <label className="form-check-label" htmlFor="is_active_0"> Deactive </label>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-primary">
+                        <button type="submit" onClick={submitCreateBuyerForm} className="btn btn-primary">
                             Save
                         </button>
                     </form>
@@ -559,9 +598,61 @@ const CreateBuyer = () => {
     );
 };
 
-const ManageBuyer = () => {
+
+const ManageBuyer = ({getMessage, setMessage}) => {
+    // fetch buyer list from database url manage-buyer
+    const [buyerList, setBuyerList] = React.useState([]);
+    React.useEffect(() => {
+        fetch('/development/manage-buyer')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setBuyerList(data.buyerList);
+                } else {
+                    console.log('Failed to fetch buyer list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+
+    // delete buyer
+    const deleteBuyer = (buyerId) => {
+        fetch(`/development/delete-buyer?id=${buyerId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Buyer deleted successfully');
+                    // remove the deleted buyer from buyerList
+                    const newBuyerList = buyerList.filter(buyer => buyer.id !== buyerId);
+                    setBuyerList(newBuyerList);
+                    setMessage(data.message);
+                } else {
+                    console.log('Failed to delete buyer. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
     return (
         <div className="col-md-12 col-lg-6">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div className="card">
                 <h5 className="card-header">Manage Buyers</h5>
                 <div className="table-responsive text-nowrap">
@@ -575,28 +666,46 @@ const ManageBuyer = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td className="text-truncate">1</td>
-                                <td className="text-truncate">LPP</td>
-                                <td>
-                                    <span className="badge bg-label-success rounded-pill">Active</span>
-                                </td>
-                                <td>
-                                    <div className="dropdown">
-                                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i className="mdi mdi-dots-vertical"></i>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
-                                            >
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                                            >
+                            {/* display loading bar before buyerlist show */}
+                            {buyerList.length === 0 && (
+                                <tr>
+                                    <td colSpan="4" className="text-center">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            )}
+                            
+                            {buyerList.map((buyer, index) => (
+                                <tr key={index}>
+                                    <td className="text-truncate">{index + 1}</td>
+                                    <td className="text-truncate">{buyer.name}</td>
+                                    <td>
+                                        {buyer.is_active ? (
+                                            <span className="badge bg-label-success rounded-pill">Active</span>
+                                        ) : (
+                                            <span className="badge bg-label-danger rounded-pill">Inactive</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div className="dropdown">
+                                            <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                <i className="mdi mdi-dots-vertical"></i>
+                                            </button>
+                                            <div className="dropdown-menu">
+                                                <a className="dropdown-item" href="#"
+                                                ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
+                                                >
+                                                <a className="dropdown-item" href="#" onClick={(e) => {e.preventDefault; deleteBuyer(buyer.id)}}
+                                                ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            
                         </tbody>
                     </table>
                 </div>
@@ -967,7 +1076,6 @@ const Footer = () => {
 
 const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
 
-    
     return (
         <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme open">
             <div className="app-brand demo">
@@ -1004,7 +1112,7 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
                     <ul className="menu-sub">
                         <li className={`menu-item ${activeMenuItem === 'create-buyer' ? 'active' : ''}`}>
                         <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('create-buyer'); }}>
-                            <div data-i18n="Basic">Add</div>
+                            <div data-i18n="Basic">Create</div>
                         </a>
                         </li>
                         <li className={`menu-item ${activeMenuItem === 'manage-buyer' ? 'active' : ''}`}>
@@ -1015,19 +1123,19 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
                     </ul>
                 </li>
                 {/* <!-- Requirements --> */}
-                <li className={`menu-item ${activeMenuItem === 'requirements' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('requirements')}>
+                <li className={`menu-item ${activeMenuItem === 'create-requirement' || activeMenuItem === 'manage-requirement' ? 'active open' : ''}`}>
+                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-requirement')}>
                         <i className="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
                         <div data-i18n="Misc">Requirements</div>
                     </a>
                     <ul className="menu-sub">
-                        <li className="menu-item">
-                            <a href="{% url 'add-requirement' %}" className="menu-link">
-                                <div data-i18n="Error">Add</div>
+                        <li className={`menu-item ${activeMenuItem === 'create-requirement' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('create-requirement'); }}>
+                                <div data-i18n="Error">Create</div>
                             </a>
                         </li>
-                        <li className="menu-item">
-                            <a href="{% url 'manage-requirements' %}" className="menu-link">
+                        <li className={`menu-item ${activeMenuItem === 'manage-requirement' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-requirement'); }}>
                                 <div data-i18n="Under Maintenance">Manage Req's</div>
                             </a>
                         </li>
@@ -1035,19 +1143,19 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
                 </li>
 
                 {/* <!-- Reports --> */}
-                <li className={`menu-item ${activeMenuItem === 'reports' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('reports')}>
+                <li className={`menu-item ${activeMenuItem === 'create-report' || activeMenuItem === 'manage-report' ? 'active open' : ''}`}>
+                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-report')}>
                         <i className="menu-icon tf-icons mdi mdi-form-select"></i>
                         <div data-i18n="Misc">Reports</div>
                     </a>
                     <ul className="menu-sub">
-                        <li className="menu-item">
-                            <a href="{% url 'create-report' %}" className="menu-link">
+                        <li className={`menu-item ${activeMenuItem === 'create-report' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link">
                                 <div data-i18n="Error">Create</div>
                             </a>
                         </li>
-                        <li className="menu-item">
-                            <a href="{% url 'manage-reports' %}" className="menu-link">
+                        <li className={`menu-item ${activeMenuItem === 'manage-report' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-report'); }}>
                                 <div data-i18n="Under Maintenance">Manage Reports</div>
                             </a>
                         </li>
@@ -1058,19 +1166,19 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
                 {/* <!-- Misc --> */}
                 <li className="menu-header fw-medium mt-4"><span className="menu-header-text">Misc</span></li>
                 {/* <!-- Users --> */}
-                <li className={`menu-item ${activeMenuItem === 'users' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('users')}>
+                <li className={`menu-item ${activeMenuItem === 'create-user' || activeMenuItem === 'manage-user' ? 'active open' : ''}`}>
+                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-user')}>
                         <i className="menu-icon tf-icons mdi mdi-account-outline"></i>
                         <div data-i18n="Account Settings">Users</div>
                     </a>
                     <ul className="menu-sub">
-                        <li className="menu-item">
-                            <a href="{% url 'add-user' %}" className="menu-link">
-                                <div data-i18n="Account">Add</div>
+                        <li className={`menu-item ${activeMenuItem === 'create-user' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('create-user'); }}>
+                                <div data-i18n="Account">Create</div>
                             </a>
                         </li>
-                        <li className="menu-item">
-                            <a href="{% url 'manage-users' %}" className="menu-link">
+                        <li className={`menu-item ${activeMenuItem === 'manage-user' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-user'); }}>
                                 <div data-i18n="Notifications">Manage Users</div>
                             </a>
                         </li>
@@ -1093,7 +1201,7 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
     );
 };
 
-const Navbar = () => {
+const Navbar = ({handleMenuClick}) => {
     const [isSidebarExpanded, setIsSidebarExpanded] = React.useState(true); // Add this line
 
     const toggleSidebar = (e) => {
@@ -1168,7 +1276,7 @@ const Navbar = () => {
                             </a>
                             <ul className="dropdown-menu dropdown-menu-end mt-3 py-2">
                                 <li>
-                                    <a className="dropdown-item pb-2 mb-1" href="#">
+                                    <a className="dropdown-item pb-2 mb-1" href="#" onClick={(e) => {e.preventDefault(); handleMenuClick('profile-view'); }}>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-shrink-0 me-2 pe-1">
                                                 <div className="avatar avatar-online">
@@ -1189,15 +1297,15 @@ const Navbar = () => {
                                     <div className="dropdown-divider my-1"></div>
                                 </li>
                                 <li>
-                                    <a className="dropdown-item" href="javascript:void(0);"
-                                        onClick={() => handleMenuClick('profile')}>
+                                    <a className="dropdown-item" href="#"
+                                        onClick={(e) => {e.preventDefault(); handleMenuClick('profile-view'); }}>
                                         <i className="mdi mdi-account-outline me-1 mdi-20px"></i>
                                         <span className="align-middle">My Profile</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="dropdown-item" href="javascript:void(0);"
-                                        onClick={() => handleMenuClick('change-password')}>
+                                    <a className="dropdown-item" href="#"
+                                        onClick={(e) => {e.preventDefault(); handleMenuClick('change-password'); }}>
                                         <i className="mdi mdi-key-outline me-1 mdi-20px"></i>
                                         <span className="align-middle">Change Password</span>
                                     </a>
@@ -1206,7 +1314,7 @@ const Navbar = () => {
                                     <div className="dropdown-divider my-1"></div>
                                 </li>
                                 <li>
-                                    <a className="dropdown-item" href="{% url 'logout' %}">
+                                    <a className="dropdown-item" href="/development/logout">
                                         <i className="mdi mdi-power me-1 mdi-20px"></i>
                                         <span className="align-middle">Log Out</span>
                                     </a>
@@ -1222,7 +1330,7 @@ const Navbar = () => {
 };
 
 
-const HomePage = ({ currentView, handleMenuClick, activeMenuItem }) => {
+const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem, setActiveMenuItem, getMessage, setMessage}) => {
 
     return (
         <div>
@@ -1237,7 +1345,7 @@ const HomePage = ({ currentView, handleMenuClick, activeMenuItem }) => {
                     <div className="layout-page">
 
                         {/* <!-- Navbar --> */}
-                        <Navbar />
+                        <Navbar handleMenuClick={handleMenuClick}/>
                         {/* <!-- / Navbar --> */}
 
                         {/* <!-- Content wrapper --> */}
@@ -1251,32 +1359,17 @@ const HomePage = ({ currentView, handleMenuClick, activeMenuItem }) => {
                                         <RecentReportWidget />
                                         </>
                                     )}
-                                    {currentView === 'create-buyer' && <CreateBuyer /> }
-                                    {currentView === 'manage-buyer' && <ManageBuyer /> }
-                                    {currentView === 'requirements' && (
-                                        <>
-                                        <CreateRequirement />
-                                        <ManageRequirement />
-                                        </>
-                                    )}
-                                    {currentView === 'reports' && (
-                                        <>
-                                        <CreateReport />
-                                        <ManageReport />
-                                        </>
-                                    )}
-                                    {currentView === 'users' && (
-                                        <>
-                                        <RegisterUser />
-                                        <ManageUser />
-                                        </>
-                                    )}
-                                    {currentView === 'profile' && (
-                                        <>
-                                        <UserProfile />
-                                        <ChangePassword />
-                                        </>
-                                    )}
+                                    {currentView === 'create-buyer' && <CreateBuyer currentView={currentView} setCurrentView={setCurrentView} 
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} getMessage={getMessage} setMessage={setMessage} /> }
+                                    {currentView === 'manage-buyer' && <ManageBuyer getMessage={getMessage} setMessage={setMessage} /> }
+                                    {currentView === 'create-requirement' && <CreateRequirement /> }
+                                    {currentView === 'manage-requirement' && <ManageRequirement /> }
+                                    {currentView === 'create-report' && <CreateReport /> }
+                                    {currentView === 'manage-report' && <ManageReport /> }
+                                    {currentView === 'create-user' && <CreateUser /> }
+                                    {currentView === 'manage-user' && <ManageUser /> }
+                                    {currentView === 'profile-view' && <ProfileView /> }
+                                    {currentView === 'change-password' && <ChangePassword /> }
                                 </div>
                             </div>
                             {/* <!-- / Content --> */}
@@ -1301,10 +1394,23 @@ const HomePage = ({ currentView, handleMenuClick, activeMenuItem }) => {
     );
 }
 
-const App = () => {
-    const [currentView, setCurrentView] = React.useState('dashboard');
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+};
 
+
+const App = () => {
+    
+    const [getMessage, setMessage] = React.useState(null);
+    const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
+
+    setTimeout(() => {
+        setMessage(null);
+    }, 5000);
 
     const handleMenuClick = (view) => {
         setCurrentView(view); // Update currentView
@@ -1312,12 +1418,21 @@ const App = () => {
         setActiveMenuItem(activeMenuItem === view ? null : view);
     };
 
-
+    // useEffect when currentview change
     return (
         <div>
-            <HomePage currentView={currentView} handleMenuClick={handleMenuClick} activeMenuItem={activeMenuItem}/>
+            <HomePage 
+                currentView={currentView} 
+                setCurrentView={setCurrentView} 
+                handleMenuClick={handleMenuClick} 
+                activeMenuItem={activeMenuItem} 
+                setActiveMenuItem={setActiveMenuItem}
+                getMessage={getMessage}
+                setMessage={setMessage}
+            />
         </div>
     );
+    
 };
 
 ReactDOM.render(<App />, app);

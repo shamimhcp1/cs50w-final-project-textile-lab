@@ -1,16 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.urls import reverse
+from django.db import IntegrityError
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import serializers, status
+
 from .models import Buyer, DevReport, User, DevRequirement
 from .serializers import BuyerSerializer, DevReportSerializer
 from .forms import DevReportForm
 from .utils import render_to_pdf
-from django.contrib.auth import authenticate, login, logout
-from django.urls import reverse
-from django.db import IntegrityError
 
 
 @login_required(login_url='login')
@@ -74,37 +77,63 @@ def create_report(request):
     # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# buyer
+# create buyer
 @login_required(login_url='login')
-def buyer_add(request):
+@api_view(['POST'])
+def create_buyer(request):
     if request.method == "POST":
-        name = request.POST["name"]
-        is_active = request.POST["is_active"]
+        try:
+            data = request.data
+            print(data)  # Log the received data
+            serializer = BuyerSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': 'success', 'message': 'Buyer created successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)  # Log any exceptions
+            return Response({'status': 'error', 'detail': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        buyer = Buyer(name=name, is_active=is_active)
-        buyer.save()
-
-        return redirect('buyer-manage')
-
-    return render(request, 'development/buyer-add.html')
 
 @login_required(login_url='login')
-def buyer_manage(request):
-    buyers = Buyer.objects.all()
-    return render(request, 'development/buyer-manage.html', {
-        'buyers' : buyers
-    })
+@require_http_methods(["GET"])
+def manage_buyer(request):
+    if request.method == "GET":
+        try:
+            buyers = Buyer.objects.all()
+            serializer = BuyerSerializer(buyers, many=True)
+            return JsonResponse({'status': 'success', 'buyerList': serializer.data})
+        except Exception as e:
+            print(e)  # Log any exceptions
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# delete-buyer
+@login_required(login_url='login')
+@require_http_methods(["DELETE"])
+def delete_buyer(request):
+    if request.method == "DELETE":
+        try:
+            buyer_id = request.GET.get('id')
+            buyer = get_object_or_404(Buyer, pk=buyer_id)
+            buyer.delete()
+            return JsonResponse({'status': 'success', 'message': 'Buyer deleted successfully'})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    
 # requirements
 @login_required(login_url='login')
-def add_requirement(request):
+def create_requirement(request):
     buyers = Buyer.objects.all()
     return render(request, 'development/add-requirement.html', {
         'buyers' : buyers
     })
 
 @login_required(login_url='login')
-def manage_requirements(request):
+def manage_requirement(request):
     requirements = DevRequirement.objects.all()
     return render(request, 'development/manage-requirements.html', {
         'requirements' : requirements
@@ -113,13 +142,13 @@ def manage_requirements(request):
 
 # reports
 @login_required(login_url='login')
-def manage_reports(request):
+def manage_report(request):
     return render(request, 'development/manage-reports.html')
 
 # profile
 @login_required(login_url='login')
-def my_profile(request):
-    return render(request, 'development/my-profile.html')
+def profile_view(request):
+    return render(request, 'development/profile-view.html')
 
 @login_required(login_url='login')
 def change_password(request):
@@ -127,14 +156,14 @@ def change_password(request):
 
 # users
 @login_required(login_url='login')
-def manage_users(request):
+def manage_user(request):
     users = User.objects.all()  # Retrieve all user objects
     return render(request, 'development/manage-users.html', {
         'users' : users
     })
 
 @login_required(login_url='login')
-def add_user(request):
+def create_user(request):
     return render(request, 'development/add-user.html')
 
 
