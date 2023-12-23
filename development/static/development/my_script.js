@@ -536,24 +536,31 @@ const CreateBuyer = ({currentView, setCurrentView, setActiveMenuItem, getMessage
         })
             .then(response => response.json())
             .then(data => {
-                console.log('Success:', data);
+                console.log(data);
                 if (data.status === 'success') {
                     console.log('Redirecting to buyer list page');
                     // redirect to buyer list page
                     setCurrentView('manage-buyer'); // Update currentView
                     setActiveMenuItem('manage-buyer')
-                    setMessage(data.message)
                 } else {
-                    console.log('Failed to create buyer. Status:', data.status);
+                    console.log('Failed to create buyer. Status:', data.status);      
                 }
+                setMessage(data.message);                
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     };
 
     return (
         <div className="col-md-12 col-lg-6">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div className="card mb-4">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">Create Buyer</h5>
@@ -598,8 +605,96 @@ const CreateBuyer = ({currentView, setCurrentView, setActiveMenuItem, getMessage
     );
 };
 
+const EditBuyer = ({currentView, setCurrentView, updatedBuyer, setUpdatedBuyer, getMessage, setMessage }) => {
 
-const ManageBuyer = ({getMessage, setMessage}) => {
+    // submit the below form with fetch
+    const submitUpdateBuyerForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('updateBuyerForm');
+        const formData = new FormData(form);
+        
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/update-buyer', {
+            method: 'PUT',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to buyer list page');
+                    // redirect to buyer list page
+                    setCurrentView('manage-buyer'); // Update currentView
+                } else {
+                    console.log('Failed to update buyer. Status:', data.status);      
+                }
+                setMessage(data.message); // Update message              
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+
+    return (
+        <div className="col-md-12 col-lg-6">
+            <div className="card mb-4">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0">Edit Buyer</h5>
+                    <small className="text-muted float-end">Tusuka-Development</small>
+                </div>
+                <div className="card-body">
+                    <form method="POST" action="" id="updateBuyerForm">
+                        <div className="form-floating form-floating-outline mb-4">
+                            <input type="text" className="form-control" name="name" id="name" placeholder="Buyer Name" value={ updatedBuyer.name } />
+                            <label htmlFor="name">Buyer Name</label>
+                        </div>
+                        <div className="form-floating form-floating-outline mb-4">
+                            <div className="form-check mt-3">
+                                <input
+                                    name="is_active"
+                                    className="form-check-input"
+                                    type="radio"
+                                    value="1"
+                                    id="is_active_1"
+                                    checked={updatedBuyer.is_active}
+                                    onChange={() => setUpdatedBuyer({ ...updatedBuyer, is_active: true })}
+                                    />
+                                <label className="form-check-label" htmlFor="is_active_1"> Active </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    name="is_active"
+                                    className="form-check-input"
+                                    type="radio"
+                                    value="0"
+                                    id="is_active_0"
+                                    checked={!updatedBuyer.is_active}
+                                    onChange={() => setUpdatedBuyer({ ...updatedBuyer, is_active: false })}
+                                    />
+                                <label className="form-check-label" htmlFor="is_active_0"> Deactive </label>
+                            </div>
+                        </div>
+                        <button type="submit" onClick={submitUpdateBuyerForm} className="btn btn-primary">
+                            Update
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ManageBuyer = ({getMessage, setMessage, currentView, setCurrentView, updatedBuyer, setUpdatedBuyer }) => {
     // fetch buyer list from database url manage-buyer
     const [buyerList, setBuyerList] = React.useState([]);
     React.useEffect(() => {
@@ -638,6 +733,26 @@ const ManageBuyer = ({getMessage, setMessage}) => {
                     setMessage(data.message);
                 } else {
                     console.log('Failed to delete buyer. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
+    // edit buyer
+    const editBuyer = (buyerId) => {
+        fetch(`/development/edit-buyer?id=${buyerId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Buyer fetched successfully');
+                    setUpdatedBuyer(data.buyer); // Update updatedBuyer
+                    // redirect to edit buyer component
+                    setCurrentView('edit-buyer'); // Update currentView
+                } else {
+                    console.log('Failed to fetch buyer. Status:', data.status);
                 }
             })
             .catch((error) => {
@@ -694,7 +809,7 @@ const ManageBuyer = ({getMessage, setMessage}) => {
                                                 <i className="mdi mdi-dots-vertical"></i>
                                             </button>
                                             <div className="dropdown-menu">
-                                                <a className="dropdown-item" href="#"
+                                                <a className="dropdown-item" href="#" onClick={(e) => {e.preventDefault; editBuyer(buyer.id)}}
                                                 ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
                                                 >
                                                 <a className="dropdown-item" href="#" onClick={(e) => {e.preventDefault; deleteBuyer(buyer.id)}}
@@ -1330,7 +1445,8 @@ const Navbar = ({handleMenuClick}) => {
 };
 
 
-const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem, setActiveMenuItem, getMessage, setMessage}) => {
+const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem, setActiveMenuItem, 
+                    getMessage, setMessage, updatedBuyer, setUpdatedBuyer}) => {
 
     return (
         <div>
@@ -1361,7 +1477,13 @@ const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem
                                     )}
                                     {currentView === 'create-buyer' && <CreateBuyer currentView={currentView} setCurrentView={setCurrentView} 
                                         activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} getMessage={getMessage} setMessage={setMessage} /> }
-                                    {currentView === 'manage-buyer' && <ManageBuyer getMessage={getMessage} setMessage={setMessage} /> }
+
+                                    {currentView === 'manage-buyer' && <ManageBuyer getMessage={getMessage} setMessage={setMessage} currentView={currentView} setCurrentView={setCurrentView} 
+                                        updatedBuyer={updatedBuyer} setUpdatedBuyer={setUpdatedBuyer} /> }
+
+                                    {currentView === 'edit-buyer' && <EditBuyer currentView={currentView} setCurrentView={setCurrentView} 
+                                        updatedBuyer={updatedBuyer} setUpdatedBuyer={setUpdatedBuyer} getMessage={getMessage} setMessage={setMessage} /> }
+
                                     {currentView === 'create-requirement' && <CreateRequirement /> }
                                     {currentView === 'manage-requirement' && <ManageRequirement /> }
                                     {currentView === 'create-report' && <CreateReport /> }
@@ -1370,6 +1492,7 @@ const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem
                                     {currentView === 'manage-user' && <ManageUser /> }
                                     {currentView === 'profile-view' && <ProfileView /> }
                                     {currentView === 'change-password' && <ChangePassword /> }
+                                    
                                 </div>
                             </div>
                             {/* <!-- / Content --> */}
@@ -1407,6 +1530,8 @@ const App = () => {
     const [getMessage, setMessage] = React.useState(null);
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
+    // keep updated buyer in a react state veriable
+    const [updatedBuyer, setUpdatedBuyer] = React.useState({});
 
     setTimeout(() => {
         setMessage(null);
@@ -1429,6 +1554,8 @@ const App = () => {
                 setActiveMenuItem={setActiveMenuItem}
                 getMessage={getMessage}
                 setMessage={setMessage}
+                updatedBuyer={updatedBuyer}
+                setUpdatedBuyer={setUpdatedBuyer}
             />
         </div>
     );

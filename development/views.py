@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -92,7 +94,7 @@ def create_buyer(request):
             return Response({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)  # Log any exceptions
-            return Response({'status': 'error', 'detail': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @login_required(login_url='login')
@@ -122,8 +124,52 @@ def delete_buyer(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+#edit buyer
+@login_required(login_url='login')
+@require_http_methods(["GET", "PUT"])
+def edit_buyer(request):
+    if request.method == "GET":
+        try:
+            buyer_id = request.GET.get('id')
+            buyer = get_object_or_404(Buyer, pk=buyer_id)
+            serializer = BuyerSerializer(buyer)
+            return JsonResponse({'status': 'success', 'buyer': serializer.data})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    
+    elif request.method == "PUT":
+        try:
+            buyer_id = request.GET.get('id')
+            buyer = get_object_or_404(Buyer, pk=buyer_id)
+            data = request.data
+            serializer = BuyerSerializer(buyer, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({'status': 'success', 'message': 'Buyer updated successfully'})
+            return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# update_buyer
+@login_required(login_url='login')
+@require_http_methods(["PUT", "POST"])
+def update_buyer(request):
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            buyer_id = data.get('id')
+            buyer = get_object_or_404(Buyer, pk=buyer_id)
+            serializer = BuyerSerializer(buyer, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({'status': 'success', 'message': 'Buyer updated successfully'})
+            return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # requirements
 @login_required(login_url='login')
 def create_requirement(request):

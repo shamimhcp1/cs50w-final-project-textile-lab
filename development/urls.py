@@ -13,6 +13,10 @@ urlpatterns = [
     path('manage-buyer', views.manage_buyer, name='manage-buyer'),
     # delete buyer
     path('delete-buyer', views.delete_buyer, name='delete-buyer'),
+    # edit buyer
+    path('edit-buyer', views.edit_buyer, name='edit-buyer'),
+    # update buyer
+    path('update-buyer', views.update_buyer, name='update-buyer'),
 
     # requirements
     path('manage-requirement', views.manage_requirement, name='manage-requirement'),
