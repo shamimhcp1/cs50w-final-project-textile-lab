@@ -1067,8 +1067,9 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
                                     name="buyer"
                                     id="buyer"
                                     placeholder="Label"
-                                    value={updatedRequirement.buyer} // Set value to updatedRequirement property
-                                    onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, buyer: e.target.value })}
+                                    value={updatedRequirement.buyer_name} // Set value to updatedRequirement property
+                                    onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, buyer_name: e.target.value })}
+                                    disabled
                                 />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="requirement_label">Label</label>
@@ -1755,6 +1756,7 @@ const App = () => {
     // setUpdateRequirement
     const [updatedRequirement, setUpdatedRequirement] = React.useState({
         buyer : '',
+        buyer_name : '',
         requirement_label : '',
         is_active : '',
         dry_rubbing : '',
