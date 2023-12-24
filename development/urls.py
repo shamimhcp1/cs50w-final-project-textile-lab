@@ -23,7 +23,16 @@ urlpatterns = [
     path('create-requirement', views.create_requirement, name='create-requirement'),
     # delete requirements
     path('delete-requirement', views.delete_requirement, name='delete-requirement'),
+    # edit requirements
+    path('edit-requirement', views.edit_requirement, name='edit-requirement'),
     
+    # get active requirements
+    # path('get-active-requirement', views.get_active_requirement, name='get-active-requirement'),
+    
+    # get requirements by buyer
+    # path('get-requirement-by-buyer', views.get_requirement_by_buyer, name='get-requirement-by-buyer'),
+
+
     # report
     path('create-report', views.create_report, name='create-report'),
     path('manage-report', views.manage_report, name='manage-report'),

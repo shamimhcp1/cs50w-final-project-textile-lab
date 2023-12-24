@@ -199,6 +199,34 @@ def manage_requirement(request):
             traceback.print_exc()
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+# edit_requirement
+@login_required(login_url='login')
+@require_http_methods(["GET", "PUT"])
+def edit_requirement(request):
+    if request.method == "GET":
+        try:
+            requirement_id = request.GET.get('id')
+            requirement = get_object_or_404(DevRequirement, pk=requirement_id)
+            serializer = DevRequirementSerializer(requirement)
+            return JsonResponse({'status': 'success', 'devRequirement': serializer.data})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            requirement_id = data.get('id')
+            requirement = get_object_or_404(DevRequirement, pk=requirement_id)
+            serializer = DevRequirementSerializer(requirement, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({'status': 'success', 'message': 'Requirement updated successfully'})
+            return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # delete_requirement
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])

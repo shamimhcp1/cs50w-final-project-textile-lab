@@ -904,7 +904,7 @@ const CreateRequirement = ({currentView, setCurrentView, setActiveMenuItem, getM
     );
 };
 
-const ManageRequirement = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
+const ManageRequirement = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage, updatedRequirement, setUpdatedRequirement }) => {
     // fetch dev requirement list from database url manage-requirement
     const [devRequirementList, setDevRequirementList] = React.useState([]);
     React.useEffect(() => {
@@ -943,6 +943,25 @@ const ManageRequirement = ({currentView, setCurrentView, setActiveMenuItem, getM
                     setMessage(data.message);
                 } else {
                     console.log('Failed to delete requirement. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
+    // editRequirement
+    const editRequirement = (requirementId) => {
+        fetch(`/development/edit-requirement?id=${requirementId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Requirement fetched successfully');
+                    setUpdatedRequirement(data.devRequirement); // Update updatedRequirement
+                    setCurrentView('edit-requirement'); // Update currentView
+                } else {
+                    console.log('Failed to fetch requirement. Status:', data.status);
                 }
             })
             .catch((error) => {
@@ -1000,7 +1019,7 @@ const ManageRequirement = ({currentView, setCurrentView, setActiveMenuItem, getM
                                                 <i className="mdi mdi-dots-vertical"></i>
                                             </button>
                                             <div className="dropdown-menu">
-                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                <a className="dropdown-item" href="#" onClick={(e) => {e.preventDefault; editRequirement(devRequirement.id)}}
                                                 ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
                                                 >
                                                 <a className="dropdown-item" href="#" onClick={(e) => {e.preventDefault; deleteRequirement(devRequirement.id)}}
@@ -1019,6 +1038,158 @@ const ManageRequirement = ({currentView, setCurrentView, setActiveMenuItem, getM
         </div>
     );
 };
+
+const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUpdatedRequirement, getMessage, setMessage }) => {
+    return (
+        
+        <div className="col-xxl">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
+            <div className="card mb-4">
+                <div className="card-header d-flex align-items-center justify-content-between">
+                    <h5 className="mb-0">Edit Requirement</h5>
+                    <small className="text-muted float-end">Tusuka-Development</small>
+                </div>
+                <div className="card-body">
+                    <form method="POST" action="" id="updateRequirementForm">
+
+                        {/* <!-- Buyer --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="buyer">Buyer</label>
+                            <div className="col-sm-4">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="buyer"
+                                    id="buyer"
+                                    placeholder="Label"
+                                    value={updatedRequirement.buyer} // Set value to updatedRequirement property
+                                    onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, buyer: e.target.value })}
+                                />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="requirement_label">Label</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="requirement_label" id="requirement_label" placeholder="Label" 
+                                    value={updatedRequirement.requirement_label} // Set value to updatedRequirement property
+                                    onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, requirement_label: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Rubbing */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="dry_rubbing">Dry Rubbing</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="dry_rubbing" id="dry_rubbing" placeholder="Dry Rubbing" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="wet_rubbing">Wet Rubbing</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="wet_rubbing" id="wet_rubbing" placeholder="Wet Rubbing" />
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="rubbing_method">Rubbing Method</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="rubbing_method" id="rubbing_method" placeholder="Rubbing Method" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="rubbing_text">Rubbing Text</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="rubbing_text" id="rubbing_text" placeholder="Rubbing Text" />
+                            </div>
+                        </div>
+
+                        {/* Wash Tear */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="wash_tear_warp">Wash Tear Warp</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="wash_tear_warp" id="wash_tear_warp" placeholder="Wash Tear Warp" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="wash_tear_weft">Wash Tear Weft</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="wash_tear_weft" id="wash_tear_weft" placeholder="Wash Tear Weft" />
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="tear_method">Tear Method</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tear_method" id="tear_method" placeholder="Tear Method" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="tear_text">Tear Text</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tear_text" id="tear_text" placeholder="Tear Text" />
+                            </div>
+                        </div>
+
+                        {/* Tensile */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="tensile_warp">Tensile Warp</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tensile_warp" id="tensile_warp" placeholder="Tensile Warp" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="tensile_weft">Tensile Weft</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tensile_weft" id="tensile_weft" placeholder="Tensile Weft" />
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" htmlFor="tensile_method">Tensile Method</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tensile_method" id="tensile_method" placeholder="Tensile Method" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" htmlFor="tensile_text">Tensile Text</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tensile_text" id="tensile_text" placeholder="Tensile Text" />
+                            </div>
+                        </div>
+
+                        {/* Is Active (Radio Buttons) */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label"></label>
+                            <div className="col-sm-4">
+                                <div className="form-check form-check-inline">
+                                    <input
+                                        name="is_active"
+                                        className="form-check-input"
+                                        type="radio"
+                                        value="1"
+                                        id="is_active_1"
+                                        checked={updatedRequirement.is_active} // Set checked based on updatedRequirement
+                                        onChange={() => setUpdatedRequirement({ ...updatedRequirement, is_active: true })}
+                                    />
+                                    <label className="form-check-label" htmlFor="is_active_1"> Active </label>
+                                </div>
+                                <div className="form-check form-check-inline">
+                                    <input
+                                        name="is_active"
+                                        className="form-check-input"
+                                        type="radio"
+                                        value="0"
+                                        id="is_active_0"
+                                        checked={!updatedRequirement.is_active} // Set checked based on updatedRequirement
+                                        onChange={() => setUpdatedRequirement({ ...updatedRequirement, is_active: false })}
+                                    />
+                                    <label className="form-check-label" htmlFor="is_active_0"> Deactive </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {/* <!-- Save --> */}
+                        <div className="row justify-content-end">
+                            <div className="col-sm-10">
+                                <button type="submit" className="btn btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const CreateReport = () => {
     return (
@@ -1483,7 +1654,7 @@ const Navbar = ({handleMenuClick}) => {
 
 
 const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem, setActiveMenuItem, 
-                    getMessage, setMessage, updatedBuyer, setUpdatedBuyer}) => {
+                    getMessage, setMessage, updatedBuyer, setUpdatedBuyer, updatedRequirement, setUpdatedRequirement}) => {
 
     return (
         <div>
@@ -1512,6 +1683,7 @@ const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem
                                         <RecentReportWidget />
                                         </>
                                     )}
+                                    
                                     {currentView === 'create-buyer' && <CreateBuyer currentView={currentView} setCurrentView={setCurrentView} 
                                         activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} getMessage={getMessage} setMessage={setMessage} /> }
 
@@ -1523,7 +1695,13 @@ const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem
 
                                     {currentView === 'create-requirement' && <CreateRequirement currentView={currentView} setCurrentView={setCurrentView} 
                                         activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} getMessage={getMessage} setMessage={setMessage} /> }
-                                    {currentView === 'manage-requirement' && <ManageRequirement getMessage={getMessage} setMessage={setMessage} currentView={currentView} setCurrentView={setCurrentView} /> }
+                                    
+                                    {currentView === 'manage-requirement' && <ManageRequirement getMessage={getMessage} setMessage={setMessage} 
+                                        currentView={currentView} setCurrentView={setCurrentView} updatedRequirement={updatedRequirement} setUpdatedRequirement={setUpdatedRequirement} /> }
+                                    
+                                    {currentView === 'edit-requirement' && <EditRequirement currentView={currentView} setCurrentView={setCurrentView}
+                                        updatedRequirement={updatedRequirement} setUpdatedRequirement={setUpdatedRequirement} getMessage={getMessage} setMessage={setMessage} /> }
+
                                     {currentView === 'create-report' && <CreateReport /> }
                                     {currentView === 'manage-report' && <ManageReport /> }
                                     {currentView === 'create-user' && <CreateUser /> }
@@ -1573,7 +1751,27 @@ const App = () => {
         name : '',
         is_active : '',
     });
-
+    
+    // setUpdateRequirement
+    const [updatedRequirement, setUpdatedRequirement] = React.useState({
+        buyer : '',
+        requirement_label : '',
+        is_active : '',
+        dry_rubbing : '',
+        wet_rubbing : '',
+        rubbing_method : '',
+        rubbing_text : '',
+        wash_tear_warp : '',
+        wash_tear_weft : '',
+        tear_method : '',
+        tear_text : '',
+        tensile_warp : '',
+        tensile_weft : '',
+        tensile_method : '',
+        tensile_text : '',
+    });
+    
+    // useEffect to remove the message after 5 seconds
     setTimeout(() => {
         setMessage(null);
     }, 5000);
@@ -1597,6 +1795,8 @@ const App = () => {
                 setMessage={setMessage}
                 updatedBuyer={updatedBuyer}
                 setUpdatedBuyer={setUpdatedBuyer}
+                updatedRequirement={updatedRequirement}
+                setUpdatedRequirement={setUpdatedRequirement}
             />
         </div>
     );
