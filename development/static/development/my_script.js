@@ -619,7 +619,7 @@ const EditBuyer = ({currentView, setCurrentView, updatedBuyer, setUpdatedBuyer, 
             formDataObject[key] = value;
         });
 
-        fetch('/development/update-buyer', {
+        fetch('/development/edit-buyer', {
             method: 'PUT',
             body: JSON.stringify(formDataObject),
             headers: {
@@ -647,6 +647,12 @@ const EditBuyer = ({currentView, setCurrentView, updatedBuyer, setUpdatedBuyer, 
 
     return (
         <div className="col-md-12 col-lg-6">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div className="card mb-4">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">Edit Buyer</h5>
@@ -655,7 +661,9 @@ const EditBuyer = ({currentView, setCurrentView, updatedBuyer, setUpdatedBuyer, 
                 <div className="card-body">
                     <form method="POST" action="" id="updateBuyerForm">
                         <div className="form-floating form-floating-outline mb-4">
-                            <input type="text" className="form-control" name="name" id="name" placeholder="Buyer Name" value={ updatedBuyer.name } />
+                            <input type="hidden" name="id" value={updatedBuyer.id} />
+                            <input type="text" className="form-control" name="name" id="name" placeholder="Buyer Name" value={updatedBuyer.name} 
+                                onChange={(e) => setUpdatedBuyer({ ...updatedBuyer, name: e.target.value })}  />
                             <label htmlFor="name">Buyer Name</label>
                         </div>
                         <div className="form-floating form-floating-outline mb-4">
@@ -749,7 +757,6 @@ const ManageBuyer = ({getMessage, setMessage, currentView, setCurrentView, updat
                 if (data.status === 'success') {
                     console.log('Buyer fetched successfully');
                     setUpdatedBuyer(data.buyer); // Update updatedBuyer
-                    // redirect to edit buyer component
                     setCurrentView('edit-buyer'); // Update currentView
                 } else {
                     console.log('Failed to fetch buyer. Status:', data.status);
@@ -830,6 +837,24 @@ const ManageBuyer = ({getMessage, setMessage, currentView, setCurrentView, updat
 };
 
 const CreateRequirement = () => {
+    // fetch buyer list from database url manage-buyer
+    const [buyerList, setBuyerList] = React.useState([]);
+    React.useEffect(() => {
+        fetch('/development/get-active-buyer')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setBuyerList(data.buyerList);
+                } else {
+                    console.log('Failed to fetch buyer list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+
     return (
         <div className="col-xxl">
             <div className="card mb-4">
@@ -846,8 +871,9 @@ const CreateRequirement = () => {
                             <div className="col-sm-4">
                                 <select id="buyer-name" className="form-select">
                                     <option>--</option>
-                                    <option value="LPP">LPP</option>
-                                    <option value="Group Dynamite">Group Dynamite</option>
+                                    {buyerList.map((buyer, index) => (
+                                        <option key={index} value={buyer.id}>{buyer.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <label className="col-sm-2 col-form-label" for="basic-default-name">Label</label>
@@ -936,6 +962,24 @@ const CreateRequirement = () => {
 };
 
 const ManageRequirement = () => {
+    // fetch dev requirement list from database url manage-requirement
+    const [devRequirementList, setDevRequirementList] = React.useState([]);
+    React.useEffect(() => {
+        fetch('/development/manage-requirement')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setDevRequirementList(data.devRequirementList);
+                } else {
+                    console.log('Failed to fetch dev requirement list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+
     return (
         <div className="col-md-12 col-lg-8">
             <div className="card">
@@ -952,29 +996,46 @@ const ManageRequirement = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td className="text-truncate">1</td>
-                                <td className="text-truncate">LPP</td>
-                                <td className="text-truncate">1st</td>
-                                <td>
-                                    <span className="badge bg-label-success rounded-pill">Active</span>
-                                </td>
-                                <td>
-                                    <div className="dropdown">
-                                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i className="mdi mdi-dots-vertical"></i>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
-                                            >
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                                            >
+                            {/* display loading bar before buyerlist show */}
+                            {devRequirementList.length === 0 && (
+                                <tr>
+                                    <td colSpan="4" className="text-center">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            )}
+                            {devRequirementList.map((devRequirement, index) => (
+                                <tr key={index}>
+                                    <td className="text-truncate">{index + 1}</td>
+                                    <td className="text-truncate">{devRequirement.buyer}</td>
+                                    <td className="text-truncate">{devRequirement.label}</td>
+                                    <td>
+                                        {devRequirement.is_active ? (
+                                            <span className="badge bg-label-success rounded-pill">Active</span>
+                                        ) : (
+                                            <span className="badge bg-label-danger rounded-pill">Inactive</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div className="dropdown">
+                                            <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                <i className="mdi mdi-dots-vertical"></i>
+                                            </button>
+                                            <div className="dropdown-menu">
+                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
+                                                >
+                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            
                         </tbody>
                     </table>
                 </div>
@@ -1531,7 +1592,10 @@ const App = () => {
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
     // keep updated buyer in a react state veriable
-    const [updatedBuyer, setUpdatedBuyer] = React.useState({});
+    const [updatedBuyer, setUpdatedBuyer] = React.useState({
+        name : '',
+        is_active : '',
+    });
 
     setTimeout(() => {
         setMessage(null);

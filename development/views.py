@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 
 from .models import Buyer, DevReport, User, DevRequirement
-from .serializers import BuyerSerializer, DevReportSerializer
+from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer
 from .forms import DevReportForm
 from .utils import render_to_pdf
 
@@ -102,13 +102,27 @@ def create_buyer(request):
 def manage_buyer(request):
     if request.method == "GET":
         try:
-            buyers = Buyer.objects.all()
+            # get all buyers ordered by name
+            buyers = Buyer.objects.all().order_by('name')
             serializer = BuyerSerializer(buyers, many=True)
             return JsonResponse({'status': 'success', 'buyerList': serializer.data})
         except Exception as e:
             print(e)  # Log any exceptions
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# get_active_buyer
+@login_required(login_url='login')
+@require_http_methods(["GET"])
+def get_active_buyer(request):
+    if request.method == "GET":
+        try:
+            # get all buyers ordered by name
+            buyers = Buyer.objects.filter(is_active=1).order_by('name')
+            serializer = BuyerSerializer(buyers, many=True)
+            return JsonResponse({'status': 'success', 'buyerList': serializer.data})
+        except Exception as e:
+            print(e)
 
 # delete-buyer
 @login_required(login_url='login')
@@ -140,24 +154,6 @@ def edit_buyer(request):
 
     elif request.method == "PUT":
         try:
-            buyer_id = request.GET.get('id')
-            buyer = get_object_or_404(Buyer, pk=buyer_id)
-            data = request.data
-            serializer = BuyerSerializer(buyer, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse({'status': 'success', 'message': 'Buyer updated successfully'})
-            return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            print(e)
-            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-# update_buyer
-@login_required(login_url='login')
-@require_http_methods(["PUT", "POST"])
-def update_buyer(request):
-    if request.method == "PUT":
-        try:
             data = json.loads(request.body)
             buyer_id = data.get('id')
             buyer = get_object_or_404(Buyer, pk=buyer_id)
@@ -178,13 +174,19 @@ def create_requirement(request):
         'buyers' : buyers
     })
 
+# manage_requirement
 @login_required(login_url='login')
+@require_http_methods(["GET"])
 def manage_requirement(request):
-    requirements = DevRequirement.objects.all()
-    return render(request, 'development/manage-requirements.html', {
-        'requirements' : requirements
-    })
-
+    if request.method == "GET":
+        try:
+            # get all buyers ordered by name
+            requirements = DevRequirement.objects.all().order_by('requirement_label')
+            serializer = DevRequirementSerializer(requirements, many=True)
+            return JsonResponse({'status': 'success', 'requirementList': serializer.data})
+        except Exception as e:
+            print(e)  # Log any exceptions
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # reports
 @login_required(login_url='login')
