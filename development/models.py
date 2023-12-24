@@ -28,7 +28,7 @@ class Buyer(models.Model):
 
 class DevRequirement(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.PROTECT)
-    requirement_label = models.CharField(max_length=255, unique=True)
+    requirement_label = models.CharField(max_length=255)
     dry_rubbing = models.CharField(max_length=255, null=True, blank=True)
     wet_rubbing = models.CharField(max_length=255, null=True, blank=True)
     rubbing_method = models.CharField(max_length=100, null=True, blank=True)

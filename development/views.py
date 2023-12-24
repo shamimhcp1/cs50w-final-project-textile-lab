@@ -1,4 +1,5 @@
 import json
+import traceback  # Import the traceback module
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
@@ -166,13 +167,22 @@ def edit_buyer(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# requirements
+# create_requirement
 @login_required(login_url='login')
+@api_view(['POST'])
 def create_requirement(request):
-    buyers = Buyer.objects.all()
-    return render(request, 'development/add-requirement.html', {
-        'buyers' : buyers
-    })
+    if request.method == "POST":
+        try:
+            data = request.data
+            print(data)  # Log the received data
+            serializer = DevRequirementSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'status': 'success', 'message': 'Requirement created successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # manage_requirement
 @login_required(login_url='login')
@@ -181,11 +191,26 @@ def manage_requirement(request):
     if request.method == "GET":
         try:
             # get all buyers ordered by name
-            requirements = DevRequirement.objects.all().order_by('requirement_label')
+            requirements = DevRequirement.objects.all().order_by('buyer__name')
             serializer = DevRequirementSerializer(requirements, many=True)
-            return JsonResponse({'status': 'success', 'requirementList': serializer.data})
+            return JsonResponse({'status': 'success', 'devRequirementList': serializer.data})
         except Exception as e:
             print(e)  # Log any exceptions
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+# delete_requirement
+@login_required(login_url='login')
+@require_http_methods(["DELETE"])
+def delete_requirement(request):
+    if request.method == "DELETE":
+        try:
+            requirement_id = request.GET.get('id')
+            requirement = get_object_or_404(DevRequirement, pk=requirement_id)
+            requirement.delete()
+            return JsonResponse({'status': 'success', 'message': 'Requirement deleted successfully'})
+        except Exception as e:
+            print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # reports

@@ -21,6 +21,8 @@ urlpatterns = [
     # requirements
     path('manage-requirement', views.manage_requirement, name='manage-requirement'),
     path('create-requirement', views.create_requirement, name='create-requirement'),
+    # delete requirements
+    path('delete-requirement', views.delete_requirement, name='delete-requirement'),
     
     # report
     path('create-report', views.create_report, name='create-report'),
