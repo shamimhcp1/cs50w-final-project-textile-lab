@@ -21,7 +21,6 @@ urlpatterns = [
     path('buyer-list-requirement', views.buyer_list_requirement, name='buyer-list-requirement'),
 
 
-
     # requirements
     path('manage-requirement', views.manage_requirement, name='manage-requirement'),
     path('create-requirement', views.create_requirement, name='create-requirement'),
@@ -29,12 +28,8 @@ urlpatterns = [
     path('delete-requirement', views.delete_requirement, name='delete-requirement'),
     # edit requirements
     path('edit-requirement', views.edit_requirement, name='edit-requirement'),
-    
-    # get active requirements
-    # path('get-active-requirement', views.get_active_requirement, name='get-active-requirement'),
-    
     # get requirements by buyer
-    # path('get-requirement-by-buyer', views.get_requirement_by_buyer, name='get-requirement-by-buyer'),
+    path('get-requirement-by-buyer', views.get_requirement_by_buyer, name='get-requirement-by-buyer'),
 
 
     # report

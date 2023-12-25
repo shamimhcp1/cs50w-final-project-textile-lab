@@ -111,6 +111,7 @@ def manage_buyer(request):
             print(e)  # Log any exceptions
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 # get buyer_list_requirement with DevRequirementSerializer
 @login_required(login_url='login')
 @require_http_methods(["GET"])
@@ -118,7 +119,7 @@ def buyer_list_requirement(request):
     if request.method == "GET":
         try:
             # get set() of buyers from DevRequirementSerializer 
-            buyers = DevRequirement.objects.all().values_list('buyer__name', flat=True).distinct()
+            buyers = DevRequirement.objects.filter(is_active=1).values('buyer__id', 'buyer__name').distinct()
             return JsonResponse({'status': 'success', 'buyerList': list(buyers)})
         except Exception as e:
             print(e)
@@ -208,6 +209,21 @@ def manage_requirement(request):
             return JsonResponse({'status': 'success', 'devRequirementList': serializer.data})
         except Exception as e:
             print(e)  # Log any exceptions
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+# get_requirement_by_buyer
+@login_required(login_url='login')
+@require_http_methods(["GET"])
+def get_requirement_by_buyer(request):
+    if request.method == "GET":
+        try:
+            buyer_id = request.GET.get('id')
+            requirements = DevRequirement.objects.filter(buyer=buyer_id, is_active=1).order_by('requirement_label')
+            serializer = DevRequirementSerializer(requirements, many=True)
+            return JsonResponse({'status': 'success', 'requirementList': serializer.data})
+        except Exception as e:
+            print(e)
             traceback.print_exc()
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 

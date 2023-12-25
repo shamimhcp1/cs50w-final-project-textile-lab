@@ -1268,14 +1268,15 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
 }
 
 const CreateReport = () => {
-    // fetch buyer list from database url buyer_list_requirement
     const [uniqueBuyerListRequirement, setUniqueBuyerListRequirement] = React.useState([]);
+    // fetch buyer list from database url manage-buyer
     React.useEffect(() => {
         fetch('/development/buyer-list-requirement')
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
                 if (data.status === 'success') {
+                    // Assuming data.buyerList is an array of objects with id and name
                     setUniqueBuyerListRequirement(data.buyerList);
                 } else {
                     console.log('Failed to fetch buyer list. Status:', data.status);
@@ -1285,6 +1286,25 @@ const CreateReport = () => {
                 console.error('Error:', error);
             });
     }, []);
+
+    const [requirementList, setRequirementList] = React.useState([]);
+    // getRequirementList by buyer id, url get-requirement-by-buyer
+    const getRequirementList = (buyerId) => {
+        fetch(`/development/get-requirement-by-buyer?id=${buyerId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    // Assuming data.requirementList is an array of objects with id and name
+                    setRequirementList(data.requirementList);
+                } else {
+                    console.log('Failed to fetch requirement list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
 
     return (
         <div className="col-xxl">
@@ -1299,21 +1319,24 @@ const CreateReport = () => {
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="buyer">Buyer</label>
                             <div className="col-sm-4">
-                                <select id="buyer" name="buyer" className="form-select">
+                                <select id="buyer" name="buyer" className="form-select"
+                                    onChange={(e) => {e.preventDefault; getRequirementList(e.target.value)}} >
                                     <option>--</option>
                                     {uniqueBuyerListRequirement.map((buyer, index) => (
-                                        <option key={index} value={buyer.id}>{buyer} {buyer.id}</option>
+                                        <option key={index} value={buyer.buyer__id}>{buyer.buyer__name}</option>
                                     ))}
                                 </select>
                             </div>
                             {/* <!-- Requirements --> */}
                             <label className="col-sm-2 col-form-label" for="requirement">Requirements</label>
                             <div className="col-sm-4">
-                                <select id="requirement" name="requirement" className="form-select">
-                                    <option>--</option>
-                                    <option value="Lt/Mid">Lt/Mid</option>
-                                    <option value="Dark">Dark</option>
-                                    <option value="Brut">Brut</option>
+                                <select id="requirement" name="requirement" className="form-select" 
+                                // if requirementList is empty, disable the select element
+                                disabled={requirementList.length === 0 ? true : false}
+                                >
+                                    {requirementList.map((requirement, index) => (
+                                        <option key={index} value={requirement.id}>{requirement.requirement_label}</option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
