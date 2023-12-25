@@ -17,6 +17,10 @@ urlpatterns = [
     path('delete-buyer', views.delete_buyer, name='delete-buyer'),
     # edit buyer
     path('edit-buyer', views.edit_buyer, name='edit-buyer'),
+    # get buyerlist with requirement
+    path('buyer-list-requirement', views.buyer_list_requirement, name='buyer-list-requirement'),
+
+
 
     # requirements
     path('manage-requirement', views.manage_requirement, name='manage-requirement'),

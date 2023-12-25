@@ -38,6 +38,37 @@ class DevRequirementSerializer(serializers.ModelSerializer):
         ]
 
 class DevReportSerializer(serializers.ModelSerializer):
+    buyer_name = serializers.ReadOnlyField(source='buyer.name')
+    requirement_label = serializers.ReadOnlyField(source='requirement.requirement_label')
+    create_by = serializers.ReadOnlyField(source='create_by.username')
+
     class Meta:
         model = DevReport
-        fields = ('__all__')
+        fields = [
+            'id',
+            'buyer',
+            'buyer_name',
+            'requirement',
+            'requirement_label',
+            'style',
+            'color',
+            'fab_ref',
+            'fab_supplier',
+            'sample_type',
+            'receive_date',
+            'report_date',
+            'dry_rubbing',
+            'wet_rubbing',
+            'rubbing_comment',
+            'raw_tear_warp',
+            'raw_tear_weft',
+            'wash_tear_warp',
+            'wash_tear_weft',
+            'tear_comment',
+            'tensile_warp',
+            'tensile_weft',
+            'tensile_comment',
+            'result',
+            'create_date',
+            'create_by',
+        ]

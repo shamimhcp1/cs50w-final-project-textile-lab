@@ -1040,8 +1040,44 @@ const ManageRequirement = ({currentView, setCurrentView, setActiveMenuItem, getM
 };
 
 const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUpdatedRequirement, getMessage, setMessage }) => {
-    return (
+    // submitUpdateRequirementForm
+    const submitUpdateRequirementForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('updateRequirementForm');
+        const formData = new FormData(form);
         
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/edit-requirement', {
+            method: 'PUT',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to requirement list page');
+                    // redirect to requirement list page
+                    setCurrentView('manage-requirement'); // Update currentView
+                } else {
+                    console.log('Failed to update requirement. Status:', data.status);      
+                }
+                setMessage(data.message); // Update message              
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+    return (
         <div className="col-xxl">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
@@ -1074,6 +1110,9 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="requirement_label">Label</label>
                             <div className="col-sm-4">
+                                {/* requirement id */}
+                                <input type="hidden" name="id" value={updatedRequirement.id} />
+
                                 <input type="text" className="form-control" name="requirement_label" id="requirement_label" placeholder="Label" 
                                     value={updatedRequirement.requirement_label} // Set value to updatedRequirement property
                                     onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, requirement_label: e.target.value })}
@@ -1085,21 +1124,33 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" htmlFor="dry_rubbing">Dry Rubbing</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="dry_rubbing" id="dry_rubbing" placeholder="Dry Rubbing" />
+                                <input type="text" className="form-control" name="dry_rubbing" id="dry_rubbing" placeholder="Dry Rubbing" 
+                                value={updatedRequirement.dry_rubbing} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, dry_rubbing: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="wet_rubbing">Wet Rubbing</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="wet_rubbing" id="wet_rubbing" placeholder="Wet Rubbing" />
+                                <input type="text" className="form-control" name="wet_rubbing" id="wet_rubbing" placeholder="Wet Rubbing" 
+                                value={updatedRequirement.wet_rubbing} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, wet_rubbing: e.target.value })}
+                                />
                             </div>
                         </div>
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" htmlFor="rubbing_method">Rubbing Method</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="rubbing_method" id="rubbing_method" placeholder="Rubbing Method" />
+                                <input type="text" className="form-control" name="rubbing_method" id="rubbing_method" placeholder="Rubbing Method" 
+                                value={updatedRequirement.rubbing_method} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, rubbing_method: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="rubbing_text">Rubbing Text</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="rubbing_text" id="rubbing_text" placeholder="Rubbing Text" />
+                                <input type="text" className="form-control" name="rubbing_text" id="rubbing_text" placeholder="Rubbing Text" 
+                                value={updatedRequirement.rubbing_text} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, rubbing_text: e.target.value })}
+                                />
                             </div>
                         </div>
 
@@ -1107,21 +1158,33 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" htmlFor="wash_tear_warp">Wash Tear Warp</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="wash_tear_warp" id="wash_tear_warp" placeholder="Wash Tear Warp" />
+                                <input type="text" className="form-control" name="wash_tear_warp" id="wash_tear_warp" placeholder="Wash Tear Warp" 
+                                value={updatedRequirement.wash_tear_warp} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, wash_tear_warp: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="wash_tear_weft">Wash Tear Weft</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="wash_tear_weft" id="wash_tear_weft" placeholder="Wash Tear Weft" />
+                                <input type="text" className="form-control" name="wash_tear_weft" id="wash_tear_weft" placeholder="Wash Tear Weft" 
+                                value={updatedRequirement.wash_tear_weft} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, wash_tear_weft: e.target.value })}
+                                />
                             </div>
                         </div>
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" htmlFor="tear_method">Tear Method</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tear_method" id="tear_method" placeholder="Tear Method" />
+                                <input type="text" className="form-control" name="tear_method" id="tear_method" placeholder="Tear Method" 
+                                value={updatedRequirement.tear_method} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, tear_method: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="tear_text">Tear Text</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tear_text" id="tear_text" placeholder="Tear Text" />
+                                <input type="text" className="form-control" name="tear_text" id="tear_text" placeholder="Tear Text" 
+                                value={updatedRequirement.tear_text} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, tear_text: e.target.value })}
+                                />
                             </div>
                         </div>
 
@@ -1129,21 +1192,33 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" htmlFor="tensile_warp">Tensile Warp</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tensile_warp" id="tensile_warp" placeholder="Tensile Warp" />
+                                <input type="text" className="form-control" name="tensile_warp" id="tensile_warp" placeholder="Tensile Warp" 
+                                value={updatedRequirement.tensile_warp} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, tensile_warp: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="tensile_weft">Tensile Weft</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tensile_weft" id="tensile_weft" placeholder="Tensile Weft" />
+                                <input type="text" className="form-control" name="tensile_weft" id="tensile_weft" placeholder="Tensile Weft" 
+                                value={updatedRequirement.tensile_weft} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, tensile_weft: e.target.value })}
+                                />
                             </div>
                         </div>
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" htmlFor="tensile_method">Tensile Method</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tensile_method" id="tensile_method" placeholder="Tensile Method" />
+                                <input type="text" className="form-control" name="tensile_method" id="tensile_method" placeholder="Tensile Method" 
+                                value={updatedRequirement.tensile_method} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, tensile_method: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" htmlFor="tensile_text">Tensile Text</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tensile_text" id="tensile_text" placeholder="Tensile Text" />
+                                <input type="text" className="form-control" name="tensile_text" id="tensile_text" placeholder="Tensile Text" 
+                                value={updatedRequirement.tensile_text} 
+                                onChange={(e) => setUpdatedRequirement({ ...updatedRequirement, tensile_text: e.target.value })}
+                                />
                             </div>
                         </div>
 
@@ -1182,7 +1257,7 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
                         {/* <!-- Save --> */}
                         <div className="row justify-content-end">
                             <div className="col-sm-10">
-                                <button type="submit" className="btn btn-primary">Save</button>
+                                <button type="submit" onClick={submitUpdateRequirementForm} className="btn btn-primary">Update</button>
                             </div>
                         </div>
                     </form>
@@ -1193,6 +1268,24 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
 }
 
 const CreateReport = () => {
+    // fetch buyer list from database url buyer_list_requirement
+    const [uniqueBuyerListRequirement, setUniqueBuyerListRequirement] = React.useState([]);
+    React.useEffect(() => {
+        fetch('/development/buyer-list-requirement')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setUniqueBuyerListRequirement(data.buyerList);
+                } else {
+                    console.log('Failed to fetch buyer list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+
     return (
         <div className="col-xxl">
             <div className="card mb-4">
@@ -1208,9 +1301,9 @@ const CreateReport = () => {
                             <div className="col-sm-4">
                                 <select id="buyer" name="buyer" className="form-select">
                                     <option>--</option>
-                                    <option value="LPP">LPP</option>
-                                    <option value="Group Dynamite">Group Dynamite</option>
-                                    <option value="Bonobo">Bonobo</option>
+                                    {uniqueBuyerListRequirement.map((buyer, index) => (
+                                        <option key={index} value={buyer.id}>{buyer} {buyer.id}</option>
+                                    ))}
                                 </select>
                             </div>
                             {/* <!-- Requirements --> */}
@@ -1325,6 +1418,23 @@ const CreateReport = () => {
 };
 
 const ManageReport = () => {
+    const [reportList, setReportList] = React.useState([]);
+    React.useEffect(() => {
+        fetch('/development/manage-report')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setReportList(data.reportList);
+                } else {
+                    console.log('Failed to fetch report list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+
     return (
         <div className="col-md-12 col-lg-12">
             <div className="card">
@@ -1343,29 +1453,41 @@ const ManageReport = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td className="text-truncate">1</td>
-                                <td className="text-truncate">Group Dynamite</td>
-                                <td className="text-truncate">100089151</td>
-                                <td className="text-truncate">Blue</td>
-                                <td className="text-truncate">1st Fit</td>
-                                <td className="text-truncate">3293HRF-WECO-OCS25</td>
-                                <td>
-                                    <div className="dropdown">
-                                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i className="mdi mdi-dots-vertical"></i>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
-                                            >
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                                            >
+                            {/* display loading bar before reportList show */}
+                            {reportList.length === 0 && (
+                                <tr>
+                                    <td colSpan="7" className="text-center">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            )}
+                            {reportList.map((report, index) => (
+                                <tr key={index}>
+                                    <td className="text-truncate">{index + 1}</td>
+                                    <td className="text-truncate">{report.buyer_name}</td>
+                                    <td className="text-truncate">{report.style}</td>
+                                    <td className="text-truncate">{report.color}</td>
+                                    <td className="text-truncate">{report.sample_type}</td>
+                                    <td className="text-truncate">{report.fab_ref}</td>
+                                    <td>
+                                        <div className="dropdown">
+                                            <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                <i className="mdi mdi-dots-vertical"></i>
+                                            </button>
+                                            <div className="dropdown-menu">
+                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
+                                                >
+                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
+                                                >
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -1474,7 +1596,7 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
                     </a>
                     <ul className="menu-sub">
                         <li className={`menu-item ${activeMenuItem === 'create-report' ? 'active' : ''}`}>
-                            <a href="#" className="menu-link">
+                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('create-report'); }}>
                                 <div data-i18n="Error">Create</div>
                             </a>
                         </li>
@@ -1654,9 +1776,49 @@ const Navbar = ({handleMenuClick}) => {
 };
 
 
-const HomePage = ({ currentView, setCurrentView, handleMenuClick, activeMenuItem, setActiveMenuItem, 
-                    getMessage, setMessage, updatedBuyer, setUpdatedBuyer, updatedRequirement, setUpdatedRequirement}) => {
+const App = () => {
+    // keep updated buyer in a react state veriable
+    const [getMessage, setMessage] = React.useState(null);
+    const [currentView, setCurrentView] = React.useState('dashboard');
+    const [activeMenuItem, setActiveMenuItem] = React.useState(null);
+    
+    // keep updated buyer in a react state veriable
+    const [updatedBuyer, setUpdatedBuyer] = React.useState({
+        name : '',
+        is_active : '',
+    });
+    
+    // setUpdateRequirement
+    const [updatedRequirement, setUpdatedRequirement] = React.useState({
+        buyer : '',
+        buyer_name : '',
+        requirement_label : '',
+        is_active : '',
+        dry_rubbing : '',
+        wet_rubbing : '',
+        rubbing_method : '',
+        rubbing_text : '',
+        wash_tear_warp : '',
+        wash_tear_weft : '',
+        tear_method : '',
+        tear_text : '',
+        tensile_warp : '',
+        tensile_weft : '',
+        tensile_method : '',
+        tensile_text : '',
+    });
+    
+    // useEffect to remove the message after 5 seconds
+    setTimeout(() => {
+        setMessage(null);
+    }, 5000);
 
+    const handleMenuClick = (view) => {
+        setCurrentView(view); // Update currentView
+        console.log('CurrentView: ' + view);
+        setActiveMenuItem(activeMenuItem === view ? null : view);
+    };
+    
     return (
         <div>
             {/* <!-- Layout wrapper --> */}
@@ -1739,70 +1901,6 @@ function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
-};
-
-
-const App = () => {
-    
-    const [getMessage, setMessage] = React.useState(null);
-    const [currentView, setCurrentView] = React.useState('dashboard');
-    const [activeMenuItem, setActiveMenuItem] = React.useState(null);
-    // keep updated buyer in a react state veriable
-    const [updatedBuyer, setUpdatedBuyer] = React.useState({
-        name : '',
-        is_active : '',
-    });
-    
-    // setUpdateRequirement
-    const [updatedRequirement, setUpdatedRequirement] = React.useState({
-        buyer : '',
-        buyer_name : '',
-        requirement_label : '',
-        is_active : '',
-        dry_rubbing : '',
-        wet_rubbing : '',
-        rubbing_method : '',
-        rubbing_text : '',
-        wash_tear_warp : '',
-        wash_tear_weft : '',
-        tear_method : '',
-        tear_text : '',
-        tensile_warp : '',
-        tensile_weft : '',
-        tensile_method : '',
-        tensile_text : '',
-    });
-    
-    // useEffect to remove the message after 5 seconds
-    setTimeout(() => {
-        setMessage(null);
-    }, 5000);
-
-    const handleMenuClick = (view) => {
-        setCurrentView(view); // Update currentView
-        console.log('CurrentView: ' + view);
-        setActiveMenuItem(activeMenuItem === view ? null : view);
-    };
-
-    // useEffect when currentview change
-    return (
-        <div>
-            <HomePage 
-                currentView={currentView} 
-                setCurrentView={setCurrentView} 
-                handleMenuClick={handleMenuClick} 
-                activeMenuItem={activeMenuItem} 
-                setActiveMenuItem={setActiveMenuItem}
-                getMessage={getMessage}
-                setMessage={setMessage}
-                updatedBuyer={updatedBuyer}
-                setUpdatedBuyer={setUpdatedBuyer}
-                updatedRequirement={updatedRequirement}
-                setUpdatedRequirement={setUpdatedRequirement}
-            />
-        </div>
-    );
-    
 };
 
 ReactDOM.render(<App />, app);

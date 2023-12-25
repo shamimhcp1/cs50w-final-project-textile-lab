@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 
 from .models import Buyer, DevReport, User, DevRequirement
-from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer
+from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer
 from .forms import DevReportForm
 from .utils import render_to_pdf
 
@@ -111,6 +111,18 @@ def manage_buyer(request):
             print(e)  # Log any exceptions
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# get buyer_list_requirement with DevRequirementSerializer
+@login_required(login_url='login')
+@require_http_methods(["GET"])
+def buyer_list_requirement(request):
+    if request.method == "GET":
+        try:
+            # get set() of buyers from DevRequirementSerializer 
+            buyers = DevRequirement.objects.all().values_list('buyer__name', flat=True).distinct()
+            return JsonResponse({'status': 'success', 'buyerList': list(buyers)})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # get_active_buyer
 @login_required(login_url='login')
@@ -241,10 +253,21 @@ def delete_requirement(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# reports
+# manage_report with DevReportSerializer
 @login_required(login_url='login')
+@require_http_methods(["GET"])
 def manage_report(request):
-    return render(request, 'development/manage-reports.html')
+    if request.method == "GET":
+        try:
+            # get all buyers ordered by name
+            reports = DevReport.objects.all().order_by('buyer__name')
+            serializer = DevReportSerializer(reports, many=True)
+            return JsonResponse({'status': 'success', 'reportList': serializer.data})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
 
 # profile
 @login_required(login_url='login')
