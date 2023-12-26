@@ -1267,7 +1267,7 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
     );
 }
 
-const CreateReport = () => {
+const CreateReport = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
     const [uniqueBuyerListRequirement, setUniqueBuyerListRequirement] = React.useState([]);
     // fetch buyer list from database url manage-buyer
     React.useEffect(() => {
@@ -1306,15 +1306,60 @@ const CreateReport = () => {
             });
     };
 
+    // submitCreateReportForm
+    const submitCreateReportForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('createReportForm');
+        const formData = new FormData(form);
+        
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/create-report', {
+            method: 'POST',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to report list page');
+                    // redirect to report list page
+                    setCurrentView('manage-report'); // Update currentView
+                    setActiveMenuItem('manage-report')
+                } else {
+                    console.log('Failed to create report. Status:', data.status);      
+                }
+                setMessage(data.message);                
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+
     return (
         <div className="col-xxl">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div className="card mb-4">
                 <div className="card-header d-flex align-items-center justify-content-between">
                     <h5 className="mb-0">Create Report</h5>
                     <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
-                    <form method="post" action="{% url 'create-report' %}">
+                    <form method="POST" action="" id="createReportForm" autoComplete="off">
                         {/* <!-- Buyer --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="buyer">Buyer</label>
@@ -1335,7 +1380,7 @@ const CreateReport = () => {
                                 disabled={requirementList.length === 0 ? true : false}
                                 >
                                     {requirementList.map((requirement, index) => (
-                                        <option key={index} value={requirement.id}>{requirement.requirement_label}</option>
+                                        <option key={index} value={requirement.id}>{requirement.requirement_label} </option>
                                     ))}
                                 </select>
                             </div>
@@ -1428,8 +1473,7 @@ const CreateReport = () => {
                         {/* <!-- Save --> */}
                         <div className="row justify-content-end">
                             <div className="col-sm-10">
-                                <button type="submit" className="btn btn-primary m-2">Save</button>
-                                <button type="submit" className="btn btn-outline-primary">Save & Copy</button>
+                                <button type="submit" onClick={submitCreateReportForm} className="btn btn-primary m-2">Save</button>
                             </div>
                         </div>
                     </form>
@@ -1440,7 +1484,9 @@ const CreateReport = () => {
     );
 };
 
-const ManageReport = () => {
+
+
+const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => {
     const [reportList, setReportList] = React.useState([]);
     React.useEffect(() => {
         fetch('/development/manage-report')
@@ -1460,6 +1506,12 @@ const ManageReport = () => {
 
     return (
         <div className="col-md-12 col-lg-12">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div className="card">
                 <h5 className="card-header">Manage Reports</h5>
                 <div className="table-responsive text-nowrap">
@@ -1472,6 +1524,7 @@ const ManageReport = () => {
                                 <th className="text-truncate">Color</th>
                                 <th className="text-truncate">Sample Type</th>
                                 <th className="text-truncate">Fab Ref</th>
+                                <th className="text-truncate">Create Date</th>
                                 <th className="text-truncate">Action</th>
                             </tr>
                         </thead>
@@ -1494,15 +1547,26 @@ const ManageReport = () => {
                                     <td className="text-truncate">{report.color}</td>
                                     <td className="text-truncate">{report.sample_type}</td>
                                     <td className="text-truncate">{report.fab_ref}</td>
+                                    <td className="text-truncate">{report.create_date}</td>
                                     <td>
                                         <div className="dropdown">
                                             <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                                 <i className="mdi mdi-dots-vertical"></i>
                                             </button>
                                             <div className="dropdown-menu">
+                                                {/* view report */}            
+                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                ><i className="mdi mdi-eye-outline me-1"></i> View</a
+                                                >
+                                                {/* download report  */}
+                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                ><i className="mdi mdi-download-outline me-1"></i> Download</a
+                                                >
+                                                {/* edit report */}
                                                 <a className="dropdown-item" href="javascript:void(0);"
                                                 ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
                                                 >
+                                                {/* delete report */}
                                                 <a className="dropdown-item" href="javascript:void(0);"
                                                 ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
                                                 >
@@ -1888,8 +1952,11 @@ const App = () => {
                                     {currentView === 'edit-requirement' && <EditRequirement currentView={currentView} setCurrentView={setCurrentView}
                                         updatedRequirement={updatedRequirement} setUpdatedRequirement={setUpdatedRequirement} getMessage={getMessage} setMessage={setMessage} /> }
 
-                                    {currentView === 'create-report' && <CreateReport /> }
-                                    {currentView === 'manage-report' && <ManageReport /> }
+                                    {currentView === 'create-report' && <CreateReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage} 
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
+
+                                    {currentView === 'manage-report' && <ManageReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage} 
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
                                     {currentView === 'create-user' && <CreateUser /> }
                                     {currentView === 'manage-user' && <ManageUser /> }
                                     {currentView === 'profile-view' && <ProfileView /> }

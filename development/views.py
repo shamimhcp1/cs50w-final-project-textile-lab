@@ -16,7 +16,7 @@ from rest_framework import serializers, status
 from .models import Buyer, DevReport, User, DevRequirement
 from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer
 from .forms import DevReportForm
-from .utils import render_to_pdf
+from .utils import render_to_pdf, generate_result
 
 
 @login_required(login_url='login')
@@ -57,28 +57,27 @@ def pdf_view(request):
         return response
     return HttpResponse("Error generating PDF", status=500)
 
-
-# Report Create
-# @api_view(['POST'])
+# create_report
 @login_required(login_url='login')
+@api_view(['POST'])
 def create_report(request):
-    buyers = Buyer.objects.filter(is_active=1).order_by('name')
-    requirements = DevRequirement.objects.filter(is_active=1).order_by('requirement_label')
-    if request.method == 'POST':
-        return HttpResponse(request)
-
-    return render(request, 'development/report-create.html', {
-        'buyers' : buyers,
-        'requirements' : requirements
-    })
-
-    # serializer = DevReportSerializer(data=request.data)
-    # if serializer.is_valid():
-    #     # serializer.save()
-    #     create_pdf_excel(request) # save a pdf & excel copy of the report
-
-    # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    if request.method == "POST":
+        try:
+            data = request.data
+            print(data)  # Log the received data
+            
+            # Generate the result
+            # result = generate_result(data)
+            
+            serializer = DevReportSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save(create_by_id=request.user.id)
+                return Response({'status': 'success', 'message': 'Report created successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)  # Log any exceptions
+            return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 # create buyer
 @login_required(login_url='login')
@@ -276,7 +275,7 @@ def manage_report(request):
     if request.method == "GET":
         try:
             # get all buyers ordered by name
-            reports = DevReport.objects.all().order_by('buyer__name')
+            reports = DevReport.objects.all().order_by('-create_date')
             serializer = DevReportSerializer(reports, many=True)
             return JsonResponse({'status': 'success', 'reportList': serializer.data})
         except Exception as e:
