@@ -67,8 +67,13 @@ def create_report(request):
             print(data)  # Log the received data
             
             # Generate the result
-            # result = generate_result(data)
-            
+            result = generate_result(data)
+            data['rubbing_comment'] = result['rubbing_result']
+            data['tear_comment'] = result['tear_result']
+            data['tensile_comment'] = result['tensile_result']
+            data['result'] = result['final_result']
+            print(data) # Log the updated data
+
             serializer = DevReportSerializer(data=data)
             if serializer.is_valid():
                 serializer.save(create_by_id=request.user.id)

@@ -34,7 +34,7 @@ def get_tear_result(wash_tear_warp, wash_tear_weft, requirement):
         if ct_warp:
             if not ct_weft:
                 wash_tear_weft = float(wash_tear_weft)
-                if wash_tear_weft >= requirment:
+                if wash_tear_weft >= requirment.wash_tear_weft:
                     tear_result = "Ok"
                 else:
                     tear_result = "Not Ok"
@@ -43,7 +43,7 @@ def get_tear_result(wash_tear_warp, wash_tear_weft, requirement):
         elif ct_weft:
             if not ct_warp:
                 wash_tear_warp = float(wash_tear_warp)
-                if wash_tear_warp >= requirment:
+                if wash_tear_warp >= requirment.wash_tear_warp:
                     tear_result = "Ok"
                 else:
                     tear_result = "Not Ok"
@@ -134,4 +134,10 @@ def generate_result(dev_report):
     # calculate final result
     final_result = get_final_result(tear_result[0], tensile_result[0], rubbing_result)
 
-    return final_result, tear_result, tensile_result, rubbing_result
+    return {
+        "final_result" : final_result,
+        "tear_result" : tear_result,
+        "tensile_result" : tensile_result, 
+        "rubbing_result" : rubbing_result
+        }
+
