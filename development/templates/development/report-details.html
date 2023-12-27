@@ -94,7 +94,7 @@
             <thead>
                 <tr>
                     <th style="font-size: 12pt;">Buyer:</th>
-                    <th style="font-size: 12pt;">LPP</th>
+                    <th style="font-size: 12pt;">{{ report.buyer }}</th>
                     <th colspan="2" style="text-align: center;"> </th>
                 </tr>
             </thead>
@@ -104,32 +104,32 @@
                     <td><strong>Order No: </strong></td>
                     <td>N/A</td>
                     <td><strong>Receive Date:</strong></td>
-                    <td>2023-01-10</td>
+                    <td>{{ report.receive_date }}</td>
                 </tr>
                 <tr>
                     <td><strong>Style: </strong></td>
-                    <td>1234s</td>
+                    <td>{{ report.style }}</td>
                     <td><strong>Report Date:</strong></td>
-                    <td>2023-01-10</td>
+                    <td>{{ report.report_date }}</td>
                 </tr>
                 <tr>
                     <td><strong>Color: </strong></td>
-                    <td>55j</td>
+                    <td>{{ report.color }}</td>
                     <td><strong>Fabric Reference:</strong></td>
-                    <td>Td-4001</td>
+                    <td>{{ report.fab_ref }}</td>
                 </tr>
                 <tr>
                     <td><strong>Sample Type:</strong></td>
-                    <td>Dev</td>
+                    <td>{{ report.sample_type }}</td>
                     <td><strong>Fabric Supplier:</strong></td>
-                    <td>Texline</td>
+                    <td>{{ report.fab_supplier }}</td>
                 </tr>
             </tbody>
         </table>
 
         
         <!-- Test report section-->
-        <p> 1. Tear Strength, ISO-13937-2 </p>
+        <p> 1. {{ requirment.tear_method }}</p>
         <table class="table">
             <thead>
                 <tr>
@@ -143,23 +143,50 @@
             <tbody>
                 <tr>
                     <td>Raw</td>
-                    <td>44.22</td>
-                    <td>35.31</td>
-                    <td> - </td>
-                    <td> - </td>
+                    <!-- raw_tear_warp -->
+                    {% if report.raw_tear_warp %} 
+                        <td>{{ report.raw_tear_warp }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <!-- raw_tear_weft -->
+                    {% if report.raw_tear_weft %} 
+                        <td>{{ report.raw_tear_weft }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <td>-</td>
+                    <td>-</td>
                 </tr>
                 <tr>
                     <td>Wash</td>
-                    <td>40.64</td>
-                    <td>31.55</td>
-                    <td>20N</td>
-                    <td>Ok</td>
+                    <!-- wash_tear_warp -->
+                    {% if report.wash_tear_warp %} 
+                        <td>{{ report.wash_tear_warp }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <!-- wash_tear_weft -->
+                    {% if report.wash_tear_weft %} 
+                        <td>{{ report.wash_tear_weft }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <td>{{ requirment.tear_text }}</td>
+                    <!-- if result is Ok green, if not ok red, else warning -->
+                    {% if report.tear_comment == 'Ok' %}
+                        <td style="color: green;">{{ report.tear_comment }}</td>
+                    {% elif report.tear_comment == 'Not Ok' %}
+                        <td style="color: red;">{{ report.tear_comment }}</td>
+                    {% else %}
+                        <td style="color: orange;">{{ report.tear_comment }}</td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
 
         <!-- Tenslie report section-->
-        <p> 2. Tensile Strength, ISO-13934-2 </p>        
+        <p> 2. {{ requirment.tensile_method }}</p>        
         <table class="table">
             <thead>
                 <tr>
@@ -173,24 +200,41 @@
             <tbody>
                 <tr>
                     <td>Raw</td>
-                    <td>44.22</td>
-                    <td>35.31</td>
-                    <td> - </td>
-                    <td> - </td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
                 </tr>
                 <tr>
                     <td>Wash</td>
-                    <td>40.64</td>
-                    <td>31.55</td>
-                    <td>20N</td>
-                    <td>Ok</td>
+                    <!-- tensile_warp -->
+                    {% if report.tensile_warp %} 
+                        <td>{{ report.tensile_warp }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <!-- tensile_weft -->
+                    {% if report.tensile_weft %} 
+                        <td>{{ report.tensile_weft }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <td>{{ requirment.tensile_text }}</td>
+                    <!-- if result is Ok green, if not ok red, else warning -->
+                    {% if report.tensile_comment == 'Ok' %}
+                        <td style="color: green;">{{ report.tensile_comment }}</td>
+                    {% elif report.tensile_comment == 'Not Ok' %}
+                        <td style="color: red;">{{ report.tensile_comment }}</td>
+                    {% else %}
+                        <td style="color: orange;">{{ report.tensile_comment }}</td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
 
         
         <!-- Rubbing section-->
-        <p> 3. Colour Fastness to Rubbing, ISO-105X12 </p>
+        <p> 3. {{ requirment.rubbing_method }}</p>
         <table class="table">
             <thead>
                 <tr>
@@ -202,10 +246,27 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>4/5</td>
-                    <td>3/4</td>
-                    <td> Dry: 4, Wet: 2 </td>
-                    <td> Ok </td>
+                    <!-- dry_rubbing -->
+                    {% if report.dry_rubbing %} 
+                        <td>{{ report.dry_rubbing }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <!-- wet_rubbing -->
+                    {% if report.wet_rubbing %} 
+                        <td>{{ report.wet_rubbing }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                    <td>{{ requirment.rubbing_text }}</td>
+                    <!-- if result is Ok green, if not ok red, else warning -->
+                    {% if report.rubbing_comment == 'Ok' %}
+                        <td style="color: green;">{{ report.rubbing_comment }}</td>
+                    {% elif report.rubbing_comment == 'Not Ok' %}
+                        <td style="color: red;">{{ report.rubbing_comment }}</td>
+                    {% else %}
+                        <td style="color: orange;">{{ report.rubbing_comment }}</td>
+                    {% endif %}
                 </tr>
             </tbody>
         </table>
@@ -213,13 +274,20 @@
     
         </div>
 
-        <!-- Other Sections -->
+        <!-- Result Sections -->
         <br/>
         <div class="invoice-footer">
             <table class="table">
                 <tr>
                     <td colspan="2">
-                        <p> Result: <span style="color: red;"><u>Result is Ok</u></span> </p>
+                        <!-- if result is Ok green, if not ok red, else warning -->
+                        {% if report.result == 'Result is Ok' %}
+                            <p> Result: <span style="color: green;"><u>{{ report.result }}</u></span> </p>
+                        {% elif report.result == 'Result Not Ok' %}
+                            <p> Result: <span style="color: red;"><u>{{ report.result }}</u></span> </p>
+                        {% else %}
+                            <p> Result: <span style="color: orange;"><u>{{ report.result }}</u></span> </p>
+                        {% endif %}
                     </td>
                 </tr>
             </table>

@@ -19,14 +19,14 @@ def render_to_pdf(template_src, context_dict={}):
     return None
 
 
-
 def get_tear_result(wash_tear_warp, wash_tear_weft, requirement):
-    # get requirement
-    requirment_warp = float(requirement.wash_tear_warp)
-    requirment_weft = float(requirement.wash_tear_weft)
 
     # check if requirement
-    if requirment_warp and requirment_weft:
+    if requirement.wash_tear_warp and requirement.wash_tear_weft:
+        # get requirement
+        requirment_warp = float(requirement.wash_tear_warp)
+        requirment_weft = float(requirement.wash_tear_weft)
+
         # check wash_tear_warp and wash_tear_weft grater then or equal to requirment
         if wash_tear_warp and wash_tear_weft:
             # convert string to float
@@ -40,17 +40,19 @@ def get_tear_result(wash_tear_warp, wash_tear_weft, requirement):
                 tear_result = "Not Ok"
         else:
             tear_result = "N/A"
+    else:
+        tear_result = "See Data Sheet"
 
     return tear_result
 
 
 def get_tensile_result(tensile_warp, tensile_weft, requirement):
-    # get requirement
-    requirment_warp = float(requirement.tensile_warp)
-    requirment_weft = float(requirement.tensile_weft)
-    
     # check if requirement
-    if requirment_warp and requirment_weft:
+    if requirement.tensile_warp and requirement.tensile_weft:
+        # get requirement
+        requirment_warp = float(requirement.tensile_warp)
+        requirment_weft = float(requirement.tensile_weft)
+
         if tensile_warp and tensile_weft:
             # convert string to float
             tensile_warp = float(tensile_warp)
@@ -63,22 +65,25 @@ def get_tensile_result(tensile_warp, tensile_weft, requirement):
                 tensile_result = "Not Ok"
         else:
             tensile_result = "N/A"
+    else:
+        tensile_result = "See Data Sheet"
             
     return tensile_result
 
 # rubbing result
 def get_rubbing_result(dry_rubbing, wet_rubbing, requirement):
-    # get requirement
-    requirement_dry = requirement.dry_rubbing
-    requirement_wet = requirement.wet_rubbing
-
-    # convert string to list by comma and if no comma then convert to list
-    dry_req = requirement_dry.split(",") if "," in requirement_dry else [requirement_dry]
-    wet_req = requirement_wet.split(",") if "," in requirement_wet else [requirement_wet]
-    
-    rubbing_result = ""
     # check if requirement
-    if requirement_dry and requirement_wet:
+    if requirement.dry_rubbing and requirement.wet_rubbing:
+        # get requirement
+        requirement_dry = requirement.dry_rubbing.strip(" ")
+        requirement_wet = requirement.wet_rubbing.strip(" ")
+
+        # convert string to list by comma and if no comma then convert to list
+        dry_req = requirement_dry.split(",") if "," in requirement_dry else [requirement_dry]
+        dry_req = [x.strip(" ") for x in dry_req]
+        wet_req = requirement_wet.split(",") if "," in requirement_wet else [requirement_wet]
+        wet_req = [x.strip(" ") for x in wet_req]
+        
         # check if dry_rubbing and wet_rubbing
         if dry_rubbing and wet_rubbing:
             # check dry rubbing
@@ -94,22 +99,25 @@ def get_rubbing_result(dry_rubbing, wet_rubbing, requirement):
                 rubbing_result = "Not Ok"
         else:
             rubbing_result = "N/A"
+    else:
+        rubbing_result = "See Data Sheet"
 
     return rubbing_result
 
 # calculate final result
 def get_final_result(tear_result, tensile_result, rubbing_result):
+
     # check if tear_result and tensile_result and rubbing_result
-    if tear_result == "Ok" and tensile_result == "Ok" and rubbing_result == "Ok":
-        final_result = "Result is Ok"
-    elif tear_result == "Ok" and tensile_result == "Ok" and rubbing_result == "N/A":
-        final_result = "Result is Ok"
-    elif tear_result == "Ok" and tensile_result == "N/A" and rubbing_result == "Ok":
-        final_result = "Result is Ok"
-    elif tear_result == "Ok" and tensile_result == "N/A" and rubbing_result == "N/A":
-        final_result = "Result is Ok"
-    else:
-        final_result = "Result Not Ok"
+    while True:
+        if tear_result == "Ok" and tensile_result == "Ok" and rubbing_result == "Ok":
+            final_result = "Result is Ok"
+            break
+        elif tear_result == "Not Ok" or tensile_result == "Not Ok" or rubbing_result == "Not Ok":
+            final_result = "Result Not Ok"
+            break
+        else:
+            final_result = "See Data Sheet"
+            break
 
     return final_result
 

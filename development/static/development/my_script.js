@@ -1487,6 +1487,7 @@ const CreateReport = ({currentView, setCurrentView, setActiveMenuItem, getMessag
 
 
 const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => {
+    
     const [reportList, setReportList] = React.useState([]);
     React.useEffect(() => {
         fetch('/development/manage-report')
@@ -1503,6 +1504,43 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
                 console.error('Error:', error);
             });
     }, []);
+
+    // deleteReport
+    const deleteReport = (reportId) => {
+        fetch(`/development/delete-report?id=${reportId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Report deleted successfully');
+                    // remove the deleted report from reportList
+                    const newReportList = reportList.filter(report => report.id !== reportId);
+                    setReportList(newReportList);
+                    setMessage(data.message);
+                } else {
+                    console.log('Failed to delete report. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
+    // viewReport
+    const viewReport = (reportId) => {
+        window.open(`/development/view-report?id=${reportId}`, '_blank');
+    };
+    
+    // downloadReport
+    const downloadReport = (reportId) => {
+        window.open(`/development/download-report?id=${reportId}`, '_blank');
+    };
 
     return (
         <div className="col-md-12 col-lg-12">
@@ -1522,8 +1560,7 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
                                 <th className="text-truncate">Buyer</th>
                                 <th className="text-truncate">Style</th>
                                 <th className="text-truncate">Color</th>
-                                <th className="text-truncate">Sample Type</th>
-                                <th className="text-truncate">Fab Ref</th>
+                                <th className="text-truncate">Result</th>
                                 <th className="text-truncate">Create Date</th>
                                 <th className="text-truncate">Action</th>
                             </tr>
@@ -1545,8 +1582,16 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
                                     <td className="text-truncate">{report.buyer_name}</td>
                                     <td className="text-truncate">{report.style}</td>
                                     <td className="text-truncate">{report.color}</td>
-                                    <td className="text-truncate">{report.sample_type}</td>
-                                    <td className="text-truncate">{report.fab_ref}</td>
+                                    {/* get result, if result is ok green, if result not ok red, else warning */}
+                                    <td>
+                                        {report.result === 'Result is Ok' ? (
+                                            <span className="badge bg-label-success rounded-pill">Result is Ok</span>
+                                        ) : report.result === 'Result Not Ok' ? (
+                                            <span className="badge bg-label-danger rounded-pill">Result Not OK</span>
+                                        ) : (
+                                            <span className="badge bg-label-warning rounded-pill">See Data Sheet</span>
+                                        )}
+                                    </td>                                    
                                     <td className="text-truncate">{report.create_date}</td>
                                     <td>
                                         <div className="dropdown">
@@ -1555,11 +1600,11 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
                                             </button>
                                             <div className="dropdown-menu">
                                                 {/* view report */}            
-                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                <a className="dropdown-item" href="javascript:void(0);" onClick={(e) => {e.preventDefault; viewReport(report.id)}}  
                                                 ><i className="mdi mdi-eye-outline me-1"></i> View</a
                                                 >
                                                 {/* download report  */}
-                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                <a className="dropdown-item" href="javascript:void(0);" onClick={(e) => {e.preventDefault; downloadReport(report.id)}}  
                                                 ><i className="mdi mdi-download-outline me-1"></i> Download</a
                                                 >
                                                 {/* edit report */}
@@ -1567,7 +1612,7 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
                                                 ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
                                                 >
                                                 {/* delete report */}
-                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                <a className="dropdown-item" href="#" onClick={(e) => {e.preventDefault; deleteReport(report.id)}}
                                                 ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
                                                 >
                                             </div>
@@ -1789,8 +1834,8 @@ const Navbar = ({handleMenuClick}) => {
                             <input
                                 type="text"
                                 className="form-control border-0 shadow-none bg-body"
-                                placeholder="Search..."
-                                aria-label="Search..." />
+                                placeholder="Search Report..."
+                                aria-label="Search Report..." />
                         </div>
                     </div>
                     {/* <!-- /Search --> */}

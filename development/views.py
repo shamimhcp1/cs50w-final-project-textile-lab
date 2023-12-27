@@ -23,39 +23,46 @@ from .utils import render_to_pdf, generate_result
 def index(request):
     return render(request, 'development/index.html')
 
-data = {
-    "company": "Dennnis Ivanov Company",
-    "address": "123 Street name",
-    "city": "Vancouver",
-    "state": "WA",
-    "zipcode": "98663",
-    "phone": "555-555-2345",
-    "email": "youremail@dennisivy.com",
-    "website": "dennisivy.com",
-}
 
+# download_report
 @login_required(login_url='login')
-def pdf_download(request):
-    pdf = render_to_pdf('development/report-details.html', data)
+@require_http_methods(["GET"])
+def download_report(request):
+    report_id = request.GET.get('id')
+    report = get_object_or_404(DevReport, pk=report_id)
+    # get required data from report
+    requirment = get_object_or_404(DevRequirement, pk=report.requirement.id)
+    # render_to_pdf
+    pdf = render_to_pdf('development/report-details.html', {
+        'report': report,
+        'requirment' : requirment
+        })
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "Invoice_12341231.pdf" 
+        filename = f"Report_{report_id}.pdf" 
         response['Content-Disposition'] = f"attachment; filename={filename}"
         return response
     return HttpResponse("Error generating PDF", status=500)
 
 
+# view_report
 @login_required(login_url='login')
-def pdf_template(request):
-    return render(request, 'development/report-details.html', data)
-
-@login_required(login_url='login')
-def pdf_view(request):
-    pdf = render_to_pdf('development/report-details.html', data)
+@require_http_methods(["GET"])
+def view_report(request):
+    report_id = request.GET.get('id')
+    report = get_object_or_404(DevReport, pk=report_id)
+    # get required data from report
+    requirment = get_object_or_404(DevRequirement, pk=report.requirement.id)
+    # render_to_pdf
+    pdf = render_to_pdf('development/report-details.html', {
+        'report': report,
+        'requirment' : requirment
+        })
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         return response
     return HttpResponse("Error generating PDF", status=500)
+
 
 # create_report
 @login_required(login_url='login')
@@ -83,7 +90,21 @@ def create_report(request):
             print(e)  # Log any exceptions
             traceback.print_exc()
             return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
+# delete_report
+@login_required(login_url='login')
+@require_http_methods(["DELETE"])
+def delete_report(request):
+    if request.method == "DELETE":
+        try:
+            report_id = request.GET.get('id')
+            report = get_object_or_404(DevReport, pk=report_id)
+            report.delete()
+            return JsonResponse({'status': 'success', 'message': 'Report deleted successfully'})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # create buyer
 @login_required(login_url='login')
@@ -281,7 +302,7 @@ def manage_report(request):
     if request.method == "GET":
         try:
             # get all buyers ordered by name
-            reports = DevReport.objects.all().order_by('-create_date')
+            reports = DevReport.objects.all().order_by('-id')
             serializer = DevReportSerializer(reports, many=True)
             return JsonResponse({'status': 'success', 'reportList': serializer.data})
         except Exception as e:

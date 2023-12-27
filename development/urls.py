@@ -35,7 +35,14 @@ urlpatterns = [
     # report
     path('create-report', views.create_report, name='create-report'),
     path('manage-report', views.manage_report, name='manage-report'),
-    
+    # delete-report
+    path('delete-report', views.delete_report, name='delete-report'),
+    # view-report
+    path('view-report', views.view_report, name='view-report'),
+    # download-report
+    path('download-report', views.download_report, name='download-report'),
+
+
     # users
     path('manage-user', views.manage_user, name='manage-user'),
     path('create-user', views.create_user, name='create-user'),
@@ -43,11 +50,6 @@ urlpatterns = [
     # profile
     path('profile-view', views.profile_view, name='profile-view'),
     path('change-password', views.change_password, name='change-password'),
-    
-    # pdf / Excel
-    path('pdf-template', views.pdf_template, name='pdf-template'),
-    path('pdf-view', views.pdf_view, name='pdf-view'),
-    path('pdf-download', views.pdf_download, name='pdf-download'),
 
     # API
     path('api/', views.ApiOverview, name='api-home'),
