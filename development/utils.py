@@ -19,97 +19,94 @@ def render_to_pdf(template_src, context_dict={}):
     return None
 
 
-# tear result
+
 def get_tear_result(wash_tear_warp, wash_tear_weft, requirement):
-    requirment = float(20)
-    tear_result = ""
+    # get requirement
+    requirment_warp = float(requirement.wash_tear_warp)
+    requirment_weft = float(requirement.wash_tear_weft)
 
-    # check wash_tear_warp and wash_tear_weft grater then or equal to requirment
-    if wash_tear_warp and wash_tear_weft:
-        # check cross tear "ct" value
-        ct_warp = wash_tear_warp.endswith("CT")
-        ct_weft = wash_tear_weft.endswith("CT")
-
-        # cross tear warp
-        if ct_warp:
-            if not ct_weft:
-                wash_tear_weft = float(wash_tear_weft)
-                if wash_tear_weft >= requirment.wash_tear_weft:
-                    tear_result = "Ok"
-                else:
-                    tear_result = "Not Ok"
-                
-        # cross tear weft
-        elif ct_weft:
-            if not ct_warp:
-                wash_tear_warp = float(wash_tear_warp)
-                if wash_tear_warp >= requirment.wash_tear_warp:
-                    tear_result = "Ok"
-                else:
-                    tear_result = "Not Ok"
-
-        # no cross tear in both warp and weft
-        else:
+    # check if requirement
+    if requirment_warp and requirment_weft:
+        # check wash_tear_warp and wash_tear_weft grater then or equal to requirment
+        if wash_tear_warp and wash_tear_weft:
+            # convert string to float
             wash_tear_warp = float(wash_tear_warp)
             wash_tear_weft = float(wash_tear_weft)
-            
-            if wash_tear_warp >= requirment and wash_tear_weft >= requirment:
+
+            # check wash_tear_warp and wash_tear_weft grater then or equal to requirment
+            if wash_tear_warp >= requirment_warp and wash_tear_weft >= requirment_weft:
                 tear_result = "Ok"
             else:
                 tear_result = "Not Ok"
+        else:
+            tear_result = "N/A"
 
-    return tear_result, wash_tear_warp, wash_tear_weft
+    return tear_result
 
-# get tensile result
+
 def get_tensile_result(tensile_warp, tensile_weft, requirement):
-    requirment = float(250)
-    tensile_result = ""
-    if tensile_warp and tensile_weft:
-        tensile_warp = float(tensile_warp)
-        tensile_weft = float(tensile_weft)
-        
-        if tensile_warp >= requirment and tensile_weft >= requirment:
-            tensile_result = "Ok"
+    # get requirement
+    requirment_warp = float(requirement.tensile_warp)
+    requirment_weft = float(requirement.tensile_weft)
+    
+    # check if requirement
+    if requirment_warp and requirment_weft:
+        if tensile_warp and tensile_weft:
+            # convert string to float
+            tensile_warp = float(tensile_warp)
+            tensile_weft = float(tensile_weft)
+
+            # check tensile_warp and tensile_weft grater then or equal to requirment
+            if tensile_warp >= requirment_warp and tensile_weft >= requirment_weft:
+                tensile_result = "Ok"
+            else:
+                tensile_result = "Not Ok"
         else:
-            tensile_result = "Not Ok"
-    else:
-        tensile_result = "Small Size"
+            tensile_result = "N/A"
             
-    return tensile_result, tensile_warp, tensile_weft
+    return tensile_result
 
-# get rubbing result
+# rubbing result
 def get_rubbing_result(dry_rubbing, wet_rubbing, requirement):
+    # get requirement
+    requirement_dry = requirement.dry_rubbing
+    requirement_wet = requirement.wet_rubbing
+
+    # convert string to list by comma and if no comma then convert to list
+    dry_req = requirement_dry.split(",") if "," in requirement_dry else [requirement_dry]
+    wet_req = requirement_wet.split(",") if "," in requirement_wet else [requirement_wet]
+    
     rubbing_result = ""
-    if dry_rubbing and wet_rubbing:
-        dry_req = ["3", "3/4", "4", "4/5"]
-        wet_req = ["2", "2/3", "3", "3/4", "4", "4/5"]
-        rubbing_result = ""
+    # check if requirement
+    if requirement_dry and requirement_wet:
+        # check if dry_rubbing and wet_rubbing
+        if dry_rubbing and wet_rubbing:
+            # check dry rubbing
+            if dry_rubbing in dry_req:
+                rubbing_result = "Ok"
+            else:
+                rubbing_result = "Not Ok"
 
-        # check dry rubbing
-        if dry_rubbing in dry_req:
-            rubbing_result = "Ok"
+            # check wet rubbing
+            if wet_rubbing in wet_req:
+                rubbing_result = "Ok"
+            else:
+                rubbing_result = "Not Ok"
         else:
-            rubbing_result = "Not Ok"
-
-        # check wet rubbing
-        if wet_rubbing in wet_req:
-            rubbing_result = "Ok"
-        else:
-            rubbing_result = "Not Ok"
-    else:
-        rubbing_result = "N/A"
+            rubbing_result = "N/A"
 
     return rubbing_result
 
 # calculate final result
 def get_final_result(tear_result, tensile_result, rubbing_result):
+    # check if tear_result and tensile_result and rubbing_result
     if tear_result == "Ok" and tensile_result == "Ok" and rubbing_result == "Ok":
         final_result = "Result is Ok"
     elif tear_result == "Ok" and tensile_result == "Ok" and rubbing_result == "N/A":
         final_result = "Result is Ok"
-    elif tear_result == "Ok" and tensile_result == "Small Size" and rubbing_result == "Ok":
+    elif tear_result == "Ok" and tensile_result == "N/A" and rubbing_result == "Ok":
         final_result = "Result is Ok"
-    elif tear_result == "Ok" and tensile_result == "Small Size" and rubbing_result == "N/A":
+    elif tear_result == "Ok" and tensile_result == "N/A" and rubbing_result == "N/A":
         final_result = "Result is Ok"
     else:
         final_result = "Result Not Ok"
@@ -120,19 +117,19 @@ def get_final_result(tear_result, tensile_result, rubbing_result):
 # generate result
 def generate_result(dev_report):
     # get requirement
-    requirement = DevRequirement.objects.get(id=dev_report.requirement)
+    requirement = DevRequirement.objects.get(id=dev_report['requirement'])
     
     # get wash tear result
-    tear_result = get_tear_result(dev_report.wash_tear_warp, dev_report.wash_tear_weft, requirement)
+    tear_result = get_tear_result(dev_report['wash_tear_warp'], dev_report['wash_tear_weft'], requirement)
 
     # get tensile result
-    tensile_result = get_tensile_result(dev_report.tensile_warp, dev_report.tensile_weft, requirement)
+    tensile_result = get_tensile_result(dev_report['tensile_warp'], dev_report['tensile_weft'], requirement)
 
     # get rubbing tear result
-    rubbing_result = get_rubbing_result(dev_report.dry_rubbing, dev_report.wet_rubbing, requirement)
+    rubbing_result = get_rubbing_result(dev_report['dry_rubbing'], dev_report['wet_rubbing'], requirement)
 
     # calculate final result
-    final_result = get_final_result(tear_result[0], tensile_result[0], rubbing_result)
+    final_result = get_final_result(tear_result, tensile_result, rubbing_result)
 
     return {
         "final_result" : final_result,

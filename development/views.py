@@ -81,6 +81,7 @@ def create_report(request):
             return Response({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)  # Log any exceptions
+            traceback.print_exc()
             return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
