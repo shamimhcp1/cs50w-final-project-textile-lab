@@ -125,7 +125,7 @@ def edit_report(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        
+
 # delete_report
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
@@ -359,9 +359,30 @@ def manage_report(request):
 def profile_view(request):
     return render(request, 'development/profile-view.html')
 
+
+# change_password
 @login_required(login_url='login')
+@require_http_methods(["PUT"])
 def change_password(request):
-    return render(request, 'development/change-password.html')
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            # check if current password is correct
+            user = authenticate(username=request.user.username, password=data['current_password'])
+            if user is None:
+                return JsonResponse({'status': 'error', 'message': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+            # check if new password and confirm password is same
+            if data['new_password'] != data['confirm_password']:
+                return JsonResponse({'status': 'error', 'message': 'New password and confirm password is not same'}, status=status.HTTP_400_BAD_REQUEST)
+            # change password
+            user.set_password(data['new_password'])
+            user.save()
+            return JsonResponse({'status': 'success', 'message': 'Password changed successfully'})
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # users
 @login_required(login_url='login')

@@ -124,29 +124,79 @@ const ManageUser = () => {
     );
 };
 
-const ChangePassword = () => {
+const ChangePassword = ({
+    getMessage, 
+    setMessage,
+    currentView,
+    setCurrentView,
+}) => {
+    // submitChangePasswordForm
+    const submitChangePasswordForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('changePasswordForm');
+        const formData = new FormData(form);
+        
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/change-password', {
+            method: 'PUT',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Password changed successfully');
+                } else {
+                    console.log('Failed to change password. Status:', data.status);      
+                }               
+                setMessage(data.message); // Update message
+                form.reset(); // Reset the form
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+                form.reset(); // Reset the form
+            });
+    };
+
+
     return (
         <div class="col-md-12 col-lg-6">
+            {getMessage && (
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {getMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Change Password</h5>
                     <small class="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div class="card-body">
-                    <form>
+                    <form method="POST" action="" id="changePasswordForm">
                         <div class="form-floating form-floating-outline mb-4">
-                            <input type="password" class="form-control" id="basic-default-fullname" placeholder="Current Password" />
-                            <label for="basic-default-fullname">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" />
+                            <label for="current_password">Current Password</label>
                         </div>
                         <div class="form-floating form-floating-outline mb-4">
-                            <input type="password" class="form-control" id="basic-default-fullname" placeholder="New Password" />
-                            <label for="basic-default-fullname">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password" />
+                            <label for="new_password">New Password</label>
                         </div>
                         <div class="form-floating form-floating-outline mb-4">
-                            <input type="password" class="form-control" id="basic-default-fullname" placeholder="Confirm New Password" />
-                            <label for="basic-default-fullname">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password" />
+                            <label for="confirm_password">Confirm New Password</label>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary" onClick={submitChangePasswordForm}>Update</button>
                     </form>
                 </div>
             </div>
@@ -1654,6 +1704,7 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
             });
     };
 
+
     return (
         <div className="col-xxl">
             {getMessage && (
@@ -1671,6 +1722,8 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
                     <form method="POST" action="" id="updateReportForm" autoComplete="off">
                         {/* <!-- Buyer --> */}
                         <div className="row mb-3">
+                            {/* report id */}
+                            <input type="hidden" name="id" value={updatedReport.id} />
                             <label className="col-sm-2 col-form-label" for="buyer">Buyer</label>
                             <div className="col-sm-4">
                                 <select id="buyer" name="buyer" className="form-select"
@@ -1693,12 +1746,17 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
                             <label className="col-sm-2 col-form-label" for="requirement">Requirements</label>
                             <div className="col-sm-4">
                                 <select id="requirement" name="requirement" className="form-select" 
-                                // if requirementList is empty, disable the select element
-                                value={updatedReport.requirement}
+                                defaultValue={updatedReport.requirement_id}
+                                onChange={(e) => {e.preventDefault; setUpdatedReport({ ...updatedReport, requirement_id: e.target.value }) }}
                                 >
-                                    {requirementList.map((requirement, index) => (
-                                        <option key={index} value={requirement.id}>{requirement.requirement_label} </option>
-                                    ))}
+                                    {requirementList.length === 0 ? (
+                                        <option key={updatedReport.requirement_id} value={updatedReport.requirement_id}>{updatedReport.requirement_label}</option>
+                                    ) : (
+                                        requirementList.map((requirement, index) => (
+                                            <option key={index} value={requirement.id}>{requirement.requirement_label} </option>
+                                        ))
+                                    )}
+                                    
                                 </select>
                             </div>
                         </div>
@@ -2296,7 +2354,9 @@ const App = () => {
                                     {currentView === 'create-user' && <CreateUser /> }
                                     {currentView === 'manage-user' && <ManageUser /> }
                                     {currentView === 'profile-view' && <ProfileView /> }
-                                    {currentView === 'change-password' && <ChangePassword /> }
+                                    {currentView === 'change-password' && <ChangePassword 
+                                        getMessage={getMessage} setMessage={setMessage} 
+                                        currentView={currentView} setCurrentView={setCurrentView} /> }
                                     
                                 </div>
                             </div>
