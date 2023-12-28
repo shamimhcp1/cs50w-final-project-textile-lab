@@ -1674,10 +1674,18 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
                             <label className="col-sm-2 col-form-label" for="buyer">Buyer</label>
                             <div className="col-sm-4">
                                 <select id="buyer" name="buyer" className="form-select"
-                                    onChange={(e) => {e.preventDefault; getRequirementList(e.target.value)}} >
+                                    onChange={(e) => {e.preventDefault; getRequirementList(e.target.value);
+                                    setUpdatedReport({ ...updatedReport, buyer: e.target.value }) }} 
+                                    value={updatedReport.buyer}
+                                    >
                                     <option>--</option>
-                                    {uniqueBuyerListRequirement.map((buyer, index) => (
-                                        <option key={index} value={buyer.buyer__id}>{buyer.buyer__name}</option>
+                                    {uniqueBuyerListRequirement.map((buyer, index) => (    
+                                        <option 
+                                        key={index}
+                                        value={buyer.buyer__id}
+                                        >
+                                        {buyer.buyer__name}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
@@ -1686,7 +1694,7 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
                             <div className="col-sm-4">
                                 <select id="requirement" name="requirement" className="form-select" 
                                 // if requirementList is empty, disable the select element
-                                disabled={requirementList.length === 0 ? true : false}
+                                value={updatedReport.requirement}
                                 >
                                     {requirementList.map((requirement, index) => (
                                         <option key={index} value={requirement.id}>{requirement.requirement_label} </option>
@@ -1698,40 +1706,61 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="receive_date">Receive Date</label>
                             <div className="col-sm-4">
-                                <input type="date" className="form-control" name="receive_date" id="receive_date" />
+                                <input type="date" className="form-control" name="receive_date" id="receive_date" 
+                                value={updatedReport.receive_date}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, receive_date: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="report_date">Report Date</label>
                             <div className="col-sm-4">
-                                <input type="date" className="form-control" name="report_date" id="report_date" />
+                                <input type="date" className="form-control" name="report_date" id="report_date" 
+                                value={updatedReport.report_date}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, report_date: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Style --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="style">Style</label>
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" name="style" id="style" placeholder="Style" />
+                                <input type="text" className="form-control" name="style" id="style" placeholder="Style" 
+                                value={updatedReport.style}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, style: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Color --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="color">Color</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="color" id="color" placeholder="Color" />
+                                <input type="text" className="form-control" name="color" id="color" placeholder="Color" 
+                                value={updatedReport.color}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, color: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="sample_type">Sample Type</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="sample_type" id="sample_type" placeholder="Sample Type" />
+                                <input type="text" className="form-control" name="sample_type" id="sample_type" placeholder="Sample Type" 
+                                value={updatedReport.sample_type}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, sample_type: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Fabric Reference --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="fab_ref">Fabric Reference</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="fab_ref" id="fab_ref" placeholder="Fabric Reference" />
+                                <input type="text" className="form-control" name="fab_ref" id="fab_ref" placeholder="Fabric Reference" 
+                                value={updatedReport.fab_ref}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, fab_ref: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="fab_supplier">Supplier</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="fab_supplier" id="fab_supplier" placeholder="Supplier" />
+                                <input type="text" className="form-control" name="fab_supplier" id="fab_supplier" placeholder="Supplier" 
+                                value={updatedReport.fab_supplier}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, fab_supplier: e.target.value })}
+                                />
                             </div>
                         </div>
 
@@ -1739,44 +1768,68 @@ const EditReport = ({currentView, setCurrentView, getMessage, setMessage, update
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="dry_rubbing">Dry Rubbing</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="dry_rubbing" id="dry_rubbing" placeholder="Dry Rubbing" />
+                                <input type="text" className="form-control" name="dry_rubbing" id="dry_rubbing" placeholder="Dry Rubbing" 
+                                value={updatedReport.dry_rubbing}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, dry_rubbing: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="wet_rubbing">Wet Rubbing</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="wet_rubbing" id="wet_rubbing" placeholder="Wet Rubbing" />
+                                <input type="text" className="form-control" name="wet_rubbing" id="wet_rubbing" placeholder="Wet Rubbing" 
+                                value={updatedReport.wet_rubbing}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, wet_rubbing: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Raw Tear --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="raw_tear_warp">Raw Tear Warp</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="raw_tear_warp" id="raw_tear_warp" placeholder="Raw Tear Warp" />
+                                <input type="text" className="form-control" name="raw_tear_warp" id="raw_tear_warp" placeholder="Raw Tear Warp" 
+                                value={updatedReport.raw_tear_warp}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, raw_tear_warp: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="raw_tear_weft">Raw Tear Weft</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="raw_tear_weft" id="raw_tear_weft" placeholder="Raw Tear Warp" />
+                                <input type="text" className="form-control" name="raw_tear_weft" id="raw_tear_weft" placeholder="Raw Tear Warp" 
+                                value={updatedReport.raw_tear_weft}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, raw_tear_weft: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Wash Tear --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="wash_tear_warp">Wash Tear Warp</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="wash_tear_warp" id="wash_tear_warp" placeholder="Wash Tear Warp" />
+                                <input type="text" className="form-control" name="wash_tear_warp" id="wash_tear_warp" placeholder="Wash Tear Warp" 
+                                value={updatedReport.wash_tear_warp}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, wash_tear_warp: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="wash_tear_weft">Wash Tear Weft</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="wash_tear_weft" id="wash_tear_weft" placeholder="Wash Tear Weft" />
+                                <input type="text" className="form-control" name="wash_tear_weft" id="wash_tear_weft" placeholder="Wash Tear Weft" 
+                                value={updatedReport.wash_tear_weft}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, wash_tear_weft: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Tensile --> */}
                         <div className="row mb-3">
                             <label className="col-sm-2 col-form-label" for="tensile_warp">Tensile Warp</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tensile_warp" id="tensile_warp" placeholder="Tensile Warp" />
+                                <input type="text" className="form-control" name="tensile_warp" id="tensile_warp" placeholder="Tensile Warp" 
+                                value={updatedReport.tensile_warp}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, tensile_warp: e.target.value })}
+                                />
                             </div>
                             <label className="col-sm-2 col-form-label" for="tensile_weft">Tensile Weft</label>
                             <div className="col-sm-4">
-                                <input type="text" className="form-control" name="tensile_weft" id="tensile_weft" placeholder="Tensile Weft" />
+                                <input type="text" className="form-control" name="tensile_weft" id="tensile_weft" placeholder="Tensile Weft" 
+                                value={updatedReport.tensile_weft}
+                                onChange={(e) => setUpdatedReport({ ...updatedReport, tensile_weft: e.target.value })}
+                                />
                             </div>
                         </div>
                         {/* <!-- Save --> */}
