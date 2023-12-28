@@ -15,10 +15,9 @@ from rest_framework import serializers, status
 
 from .models import Buyer, DevReport, User, DevRequirement
 from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer
-from .forms import DevReportForm
 from .utils import render_to_pdf, generate_result
 
-
+# index
 @login_required(login_url='login')
 def index(request):
     return render(request, 'development/index.html')
@@ -91,6 +90,42 @@ def create_report(request):
             traceback.print_exc()
             return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# edit_report
+@login_required(login_url='login')
+@require_http_methods(["GET", "PUT"])
+def edit_report(request):
+    if request.method == "GET":
+        try:
+            report_id = request.GET.get('id')
+            report = get_object_or_404(DevReport, pk=report_id)
+            serializer = DevReportSerializer(report)
+            return JsonResponse({'status': 'success', 'report': serializer.data})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            report_id = data.get('id')
+            report = get_object_or_404(DevReport, pk=report_id)
+            # Generate the result
+            result = generate_result(data)
+            data['rubbing_comment'] = result['rubbing_result']
+            data['tear_comment'] = result['tear_result']
+            data['tensile_comment'] = result['tensile_result']
+            data['result'] = result['final_result']
+            print(data) # Log the updated data
+            serializer = DevReportSerializer(report, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({'status': 'success', 'message': 'Report updated successfully'})
+            return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
 # delete_report
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
@@ -123,7 +158,7 @@ def create_buyer(request):
             print(e)  # Log any exceptions
             return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
+# manage_buyer
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def manage_buyer(request):
@@ -138,7 +173,7 @@ def manage_buyer(request):
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# get buyer_list_requirement with DevRequirementSerializer
+# get buyer_list_requirement
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def buyer_list_requirement(request):
@@ -150,6 +185,7 @@ def buyer_list_requirement(request):
         except Exception as e:
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # get_active_buyer
 @login_required(login_url='login')
@@ -164,6 +200,7 @@ def get_active_buyer(request):
         except Exception as e:
             print(e)
 
+
 # delete-buyer
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
@@ -177,6 +214,7 @@ def delete_buyer(request):
         except Exception as e:
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 #edit buyer
 @login_required(login_url='login')
@@ -206,6 +244,7 @@ def edit_buyer(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 # create_requirement
 @login_required(login_url='login')
 @api_view(['POST'])
@@ -223,6 +262,7 @@ def create_requirement(request):
             print(e)
             return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 # manage_requirement
 @login_required(login_url='login')
 @require_http_methods(["GET"])
@@ -238,6 +278,7 @@ def manage_requirement(request):
             traceback.print_exc()
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 # get_requirement_by_buyer
 @login_required(login_url='login')
 @require_http_methods(["GET"])
@@ -252,6 +293,7 @@ def get_requirement_by_buyer(request):
             print(e)
             traceback.print_exc()
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 # edit_requirement
 @login_required(login_url='login')
@@ -281,6 +323,7 @@ def edit_requirement(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 # delete_requirement
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
@@ -294,6 +337,7 @@ def delete_requirement(request):
         except Exception as e:
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # manage_report with DevReportSerializer
 @login_required(login_url='login')
@@ -309,7 +353,6 @@ def manage_report(request):
             print(e)
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-
 
 # profile
 @login_required(login_url='login')
@@ -328,101 +371,12 @@ def manage_user(request):
         'users' : users
     })
 
+# create_user
 @login_required(login_url='login')
 def create_user(request):
     return render(request, 'development/add-user.html')
 
-
-
-@api_view(['GET'])
-def ApiOverview(request):
-
-    api_urls = {
-        'home': '/',
-        'buyer_list_create_view': '/buyers',
-        'buyer_detail_view': '/buyers/pk',
-        'dev_report_list_view': '/reports',
-        'dev_report_detail_view': '/reports/pk',
-        'dev_report_create': '/create'
-    }
-    return Response(api_urls)
-
-# Report List
-@api_view(['GET'])
-def dev_report_list_view(request):
-    reports = DevReport.objects.all()
-    serializer = DevReportSerializer(reports, many=True)
-    return Response(serializer.data)
-
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-def dev_report_detail_view(request, pk):
-    try:
-        report = DevReport.objects.get(pk=pk)
-    except DevReport.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = DevReportSerializer(report)
-        return Response(serializer.data)
-
-    elif request.method in ['PUT', 'PATCH']:
-        serializer = DevReportSerializer(
-            report, data=request.data, partial=request.method == 'PATCH')
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        report.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-# Buyer list
-@api_view(['GET', 'POST'])
-def buyer_list_create_view(request):
-    if request.method == 'GET':
-        buyers = Buyer.objects.all()
-        serializer = BuyerSerializer(buyers, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        buyer_name = request.data.get('name')
-
-        # Check if a buyer with the same name already exists
-        if Buyer.objects.filter(name=buyer_name).exists():
-            return Response({"detail": f"A buyer with the name '{buyer_name}' already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = BuyerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# Buyer detail
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-def buyer_detail_view(request, pk):
-    try:
-        buyer = Buyer.objects.get(pk=pk)
-    except Buyer.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = BuyerSerializer(buyer)
-        return Response(serializer.data)
-
-    elif request.method in ['PUT', 'PATCH']:
-        serializer = BuyerSerializer(
-            buyer, data=request.data, partial=request.method == 'PATCH')
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        buyer.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
+# login
 def login_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))
@@ -445,12 +399,12 @@ def login_view(request):
     else:
         return render(request, "development/login.html")
     
-
+# logout
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
-
+# register
 def register(request):
 
     if request.method == "POST":
@@ -489,7 +443,7 @@ def register(request):
         
         return render(request, "development/register.html")
 
-
+# forgot_password
 def forgot_password(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))

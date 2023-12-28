@@ -37,6 +37,8 @@ urlpatterns = [
     path('manage-report', views.manage_report, name='manage-report'),
     # delete-report
     path('delete-report', views.delete_report, name='delete-report'),
+    # edit-report
+    path('edit-report', views.edit_report, name='edit-report'),
     # view-report
     path('view-report', views.view_report, name='view-report'),
     # download-report
@@ -51,11 +53,4 @@ urlpatterns = [
     path('profile-view', views.profile_view, name='profile-view'),
     path('change-password', views.change_password, name='change-password'),
 
-    # API
-    path('api/', views.ApiOverview, name='api-home'),
-    path('api/buyers/', views.buyer_list_create_view, name='api-buyer-list-create'),
-    path('api/buyers/<int:pk>/', views.buyer_detail_view, name='api-buyer-detail'),
-    path('api/reports/', views.dev_report_list_view, name='api-dev-report-list'),
-    path('api/reports/<int:pk>/', views.dev_report_detail_view, name='api-dev-report-detail'),
-    path('api/create/', views.create_report, name='api-dev-report-create')
 ]

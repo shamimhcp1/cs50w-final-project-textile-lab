@@ -83,17 +83,11 @@ def get_rubbing_result(dry_rubbing, wet_rubbing, requirement):
         dry_req = [x.strip(" ") for x in dry_req]
         wet_req = requirement_wet.split(",") if "," in requirement_wet else [requirement_wet]
         wet_req = [x.strip(" ") for x in wet_req]
-        
+
         # check if dry_rubbing and wet_rubbing
         if dry_rubbing and wet_rubbing:
-            # check dry rubbing
-            if dry_rubbing in dry_req:
-                rubbing_result = "Ok"
-            else:
-                rubbing_result = "Not Ok"
-
-            # check wet rubbing
-            if wet_rubbing in wet_req:
+            # check if dry_rubbing and wet_rubbing in requirement
+            if dry_rubbing in dry_req and wet_rubbing in wet_req:
                 rubbing_result = "Ok"
             else:
                 rubbing_result = "Not Ok"

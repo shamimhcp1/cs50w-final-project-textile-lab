@@ -1266,46 +1266,10 @@ const EditRequirement = ({currentView, setCurrentView, updatedRequirement, setUp
         </div>
     );
 }
-
-const CreateReport = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
-    const [uniqueBuyerListRequirement, setUniqueBuyerListRequirement] = React.useState([]);
-    // fetch buyer list from database url manage-buyer
-    React.useEffect(() => {
-        fetch('/development/buyer-list-requirement')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.status === 'success') {
-                    // Assuming data.buyerList is an array of objects with id and name
-                    setUniqueBuyerListRequirement(data.buyerList);
-                } else {
-                    console.log('Failed to fetch buyer list. Status:', data.status);
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }, []);
-
-    const [requirementList, setRequirementList] = React.useState([]);
-    // getRequirementList by buyer id, url get-requirement-by-buyer
-    const getRequirementList = (buyerId) => {
-        fetch(`/development/get-requirement-by-buyer?id=${buyerId}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.status === 'success') {
-                    // Assuming data.requirementList is an array of objects with id and name
-                    setRequirementList(data.requirementList);
-                } else {
-                    console.log('Failed to fetch requirement list. Status:', data.status);
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    };
-
+// create report
+const CreateReport = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage,
+    uniqueBuyerListRequirement, requirementList, getRequirementList}) => {
+    
     // submitCreateReportForm
     const submitCreateReportForm = (e) => {
         e.preventDefault();
@@ -1485,8 +1449,8 @@ const CreateReport = ({currentView, setCurrentView, setActiveMenuItem, getMessag
 };
 
 
-
-const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => {
+// Manage Report
+const ManageReport = ({currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport}) => {
     
     const [reportList, setReportList] = React.useState([]);
     React.useEffect(() => {
@@ -1540,6 +1504,26 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
     // downloadReport
     const downloadReport = (reportId) => {
         window.open(`/development/download-report?id=${reportId}`, '_blank');
+    };
+
+    // editReport
+    const editReport = (reportId) => {
+        fetch(`/development/edit-report?id=${reportId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to edit report page');
+                    // redirect to edit report page
+                    setCurrentView('edit-report'); // Update currentView
+                    setUpdatedReport(data.report); // Update updatedReport
+                } else {
+                    console.log('Failed to fetch report. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     };
 
     return (
@@ -1608,7 +1592,7 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
                                                 ><i className="mdi mdi-download-outline me-1"></i> Download</a
                                                 >
                                                 {/* edit report */}
-                                                <a className="dropdown-item" href="javascript:void(0);"
+                                                <a className="dropdown-item" href="javascript:void(0);" onClick={(e) => {e.preventDefault; editReport(report.id)}}
                                                 ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
                                                 >
                                                 {/* delete report */}
@@ -1628,6 +1612,189 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage}) => 
     );
 };
 
+// Edit Report
+const EditReport = ({currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport, 
+    uniqueBuyerListRequirement, requirementList, getRequirementList }) => {
+
+    // submitUpdateReportForm
+    const submitUpdateReportForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('updateReportForm');
+        const formData = new FormData(form);
+        
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/edit-report', {
+            method: 'PUT',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to report list page');
+                    // redirect to report list page
+                    setCurrentView('manage-report'); // Update currentView
+                } else {
+                    console.log('Failed to update report. Status:', data.status);      
+                }
+                setMessage(data.message); // Update message              
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+
+    return (
+        <div className="col-xxl">
+            {getMessage && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {getMessage}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
+            <div className="card mb-4">
+                <div className="card-header d-flex align-items-center justify-content-between">
+                    <h5 className="mb-0">Edit Report</h5>
+                    <small className="text-muted float-end">Tusuka-Development</small>
+                </div>
+                <div className="card-body">
+                    <form method="POST" action="" id="updateReportForm" autoComplete="off">
+                        {/* <!-- Buyer --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="buyer">Buyer</label>
+                            <div className="col-sm-4">
+                                <select id="buyer" name="buyer" className="form-select"
+                                    onChange={(e) => {e.preventDefault; getRequirementList(e.target.value)}} >
+                                    <option>--</option>
+                                    {uniqueBuyerListRequirement.map((buyer, index) => (
+                                        <option key={index} value={buyer.buyer__id}>{buyer.buyer__name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {/* <!-- Requirements --> */}
+                            <label className="col-sm-2 col-form-label" for="requirement">Requirements</label>
+                            <div className="col-sm-4">
+                                <select id="requirement" name="requirement" className="form-select" 
+                                // if requirementList is empty, disable the select element
+                                disabled={requirementList.length === 0 ? true : false}
+                                >
+                                    {requirementList.map((requirement, index) => (
+                                        <option key={index} value={requirement.id}>{requirement.requirement_label} </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        {/* <!-- Date --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="receive_date">Receive Date</label>
+                            <div className="col-sm-4">
+                                <input type="date" className="form-control" name="receive_date" id="receive_date" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="report_date">Report Date</label>
+                            <div className="col-sm-4">
+                                <input type="date" className="form-control" name="report_date" id="report_date" />
+                            </div>
+                        </div>
+                        {/* <!-- Style --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="style">Style</label>
+                            <div className="col-sm-10">
+                                <input type="text" className="form-control" name="style" id="style" placeholder="Style" />
+                            </div>
+                        </div>
+                        {/* <!-- Color --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="color">Color</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="color" id="color" placeholder="Color" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="sample_type">Sample Type</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="sample_type" id="sample_type" placeholder="Sample Type" />
+                            </div>
+                        </div>
+                        {/* <!-- Fabric Reference --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="fab_ref">Fabric Reference</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="fab_ref" id="fab_ref" placeholder="Fabric Reference" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="fab_supplier">Supplier</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="fab_supplier" id="fab_supplier" placeholder="Supplier" />
+                            </div>
+                        </div>
+
+                        {/* <!-- Rubbing --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="dry_rubbing">Dry Rubbing</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="dry_rubbing" id="dry_rubbing" placeholder="Dry Rubbing" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="wet_rubbing">Wet Rubbing</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="wet_rubbing" id="wet_rubbing" placeholder="Wet Rubbing" />
+                            </div>
+                        </div>
+                        {/* <!-- Raw Tear --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="raw_tear_warp">Raw Tear Warp</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="raw_tear_warp" id="raw_tear_warp" placeholder="Raw Tear Warp" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="raw_tear_weft">Raw Tear Weft</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="raw_tear_weft" id="raw_tear_weft" placeholder="Raw Tear Warp" />
+                            </div>
+                        </div>
+                        {/* <!-- Wash Tear --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="wash_tear_warp">Wash Tear Warp</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="wash_tear_warp" id="wash_tear_warp" placeholder="Wash Tear Warp" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="wash_tear_weft">Wash Tear Weft</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="wash_tear_weft" id="wash_tear_weft" placeholder="Wash Tear Weft" />
+                            </div>
+                        </div>
+                        {/* <!-- Tensile --> */}
+                        <div className="row mb-3">
+                            <label className="col-sm-2 col-form-label" for="tensile_warp">Tensile Warp</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tensile_warp" id="tensile_warp" placeholder="Tensile Warp" />
+                            </div>
+                            <label className="col-sm-2 col-form-label" for="tensile_weft">Tensile Weft</label>
+                            <div className="col-sm-4">
+                                <input type="text" className="form-control" name="tensile_weft" id="tensile_weft" placeholder="Tensile Weft" />
+                            </div>
+                        </div>
+                        {/* <!-- Save --> */}
+                        <div className="row justify-content-end">
+                            <div className="col-sm-10">
+                                <button type="submit" onClick={submitUpdateReportForm} className="btn btn-primary m-2">Update</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+// Footer
 const Footer = () => {
     return (
         <dev>
@@ -1913,6 +2080,69 @@ const App = () => {
     const [getMessage, setMessage] = React.useState(null);
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
+
+    const [uniqueBuyerListRequirement, setUniqueBuyerListRequirement] = React.useState([]);
+    // fetch buyer list from database url manage-buyer
+    React.useEffect(() => {
+        fetch('/development/buyer-list-requirement')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    // Assuming data.buyerList is an array of objects with id and name
+                    setUniqueBuyerListRequirement(data.buyerList);
+                } else {
+                    console.log('Failed to fetch buyer list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+ 
+    const [requirementList, setRequirementList] = React.useState([]);
+    // getRequirementList by buyer id, url get-requirement-by-buyer
+    const getRequirementList = (buyerId) => {
+        fetch(`/development/get-requirement-by-buyer?id=${buyerId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    // Assuming data.requirementList is an array of objects with id and name
+                    setRequirementList(data.requirementList);
+                } else {
+                    console.log('Failed to fetch requirement list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
+    // setUpdatedReport
+    const [updatedReport, setUpdatedReport] = React.useState({
+        buyer : '',
+        buyer_name : '',
+        requirement : '',
+        requirement_label : '',
+        receive_date : '',
+        report_date : '',
+        style : '',
+        color : '',
+        sample_type : '',
+        fab_ref : '',
+        fab_supplier : '',
+        dry_rubbing : '',
+        wet_rubbing : '',
+        raw_tear_warp : '',
+        raw_tear_weft : '',
+        wash_tear_warp : '',
+        wash_tear_weft : '',
+        tensile_warp : '',
+        tensile_weft : '',
+        result : '',
+        create_date : '',
+    });
     
     // keep updated buyer in a react state veriable
     const [updatedBuyer, setUpdatedBuyer] = React.useState({
@@ -1998,10 +2228,18 @@ const App = () => {
                                         updatedRequirement={updatedRequirement} setUpdatedRequirement={setUpdatedRequirement} getMessage={getMessage} setMessage={setMessage} /> }
 
                                     {currentView === 'create-report' && <CreateReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage} 
-                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} 
+                                        uniqueBuyerListRequirement={uniqueBuyerListRequirement} setUniqueBuyerListRequirement={setUniqueBuyerListRequirement} 
+                                        requirementList={requirementList} setRequirementList={setRequirementList} getRequirementList={getRequirementList}  /> }
 
                                     {currentView === 'manage-report' && <ManageReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage} 
-                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} updatedReport={updatedReport} setUpdatedReport={setUpdatedReport} /> }
+                                    
+                                    {currentView === 'edit-report' && <EditReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage} 
+                                        updatedReport={updatedReport} setUpdatedReport={setUpdatedReport} 
+                                        uniqueBuyerListRequirement={uniqueBuyerListRequirement} setUniqueBuyerListRequirement={setUniqueBuyerListRequirement} 
+                                        requirementList={requirementList} setRequirementList={setRequirementList} getRequirementList={getRequirementList}  /> }
+
                                     {currentView === 'create-user' && <CreateUser /> }
                                     {currentView === 'manage-user' && <ManageUser /> }
                                     {currentView === 'profile-view' && <ProfileView /> }
