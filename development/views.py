@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 
 from .models import Buyer, DevReport, User, DevRequirement
-from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer
+from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer, UserSerializer
 from .utils import render_to_pdf, generate_result
 
 # index
@@ -384,18 +384,77 @@ def change_password(request):
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# users
+# manage_user
 @login_required(login_url='login')
+@require_http_methods(["GET"])
 def manage_user(request):
-    users = User.objects.all()  # Retrieve all user objects
-    return render(request, 'development/manage-users.html', {
-        'users' : users
-    })
+    if request.method == "GET":
+        try:
+            # get all users ordered by username
+            users = User.objects.all().order_by('username')
+            serializer = UserSerializer(users, many=True)
+            return JsonResponse({'status': 'success', 'userList': serializer.data})
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # create_user
 @login_required(login_url='login')
+@api_view(['POST'])
 def create_user(request):
-    return render(request, 'development/add-user.html')
+    if request.method == "POST":
+        try:
+            data = request.data
+            print(data)  # Log the received data
+
+            # check if username already exists
+            if User.objects.filter(username=data['username']).exists():
+                return Response({'status': 'error', 'message': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # check if email already exists
+            if User.objects.filter(email=data['email']).exists():
+                return Response({'status': 'error', 'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # check if password and confirmation is same
+            if data['password'] != data['confirmation']:
+                return Response({'status': 'error', 'message': 'Password and Confirm Password is not same'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # create user
+            user = User.objects.create_user(data['username'], data['email'], data['password'])
+            user.is_active = data['is_active']
+            user.save()
+            return Response({'status': 'success', 'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(e)  # Log any exceptions
+            traceback.print_exc()
+            return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# delete_user
+@login_required(login_url='login')
+@require_http_methods(["DELETE"])
+def delete_user(request):
+    if request.method == "DELETE":
+        try:
+            # check if user is superuser
+            if not request.user.is_superuser:
+                return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete user'}, status=status.HTTP_400_BAD_REQUEST)
+            user_id = request.GET.get('id')
+            user = get_object_or_404(User, pk=user_id)
+            # check if user is superuser
+            if user.is_superuser:
+                return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete superuser'}, status=status.HTTP_400_BAD_REQUEST)
+            # check if user has created any report
+            if DevReport.objects.filter(create_by=user_id).exists():
+                return JsonResponse({'status': 'error', 'message': 'User has created report. So, you are not authorized to delete this user'}, status=status.HTTP_400_BAD_REQUEST)
+            # delete user
+            user.delete()
+            return JsonResponse({'status': 'success', 'message': 'User deleted successfully'})
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # login
 def login_view(request):
@@ -431,9 +490,7 @@ def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
-        role = request.POST.get("role", "")
         is_active = request.POST.get("is_active", 0)
-
 
         # Ensure password matches confirmation
         password = request.POST["password"]
@@ -446,7 +503,6 @@ def register(request):
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
-            user.role = role
             user.is_active = is_active
             user.save()
         except IntegrityError:

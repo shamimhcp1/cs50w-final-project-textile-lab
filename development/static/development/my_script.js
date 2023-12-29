@@ -1,23 +1,61 @@
 const app = document.getElementById('app');
 
-const CreateUser = () => {
+const CreateUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
+    // submitCreateUserForm using create-user url
+    const submitCreateUserForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('createUserForm');
+        const formData = new FormData(form);
+
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/create-user', {
+            method: 'POST',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to user list page');
+                    // redirect to user list page
+                    setCurrentView('manage-user'); // Update currentView
+                    setActiveMenuItem('manage-user')
+                } else {
+                    console.log('Failed to create user. Status:', data.status);      
+                }
+                setMessage(data.message);                
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+
+
     return (
         <div class="col-md-12 col-lg-6">
+            {getMessage && (
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {getMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Add User</h5>
                     <small class="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div class="card-body">
-                    <form action="{% url 'register' %}" method="POST">
-                        <div class="form-floating form-floating-outline mb-4">
-                            <select id="role" class="form-select" name="role">
-                                <option>-Select Role-</option>
-                                <option value="incharge">Incharge</option>
-                                <option value="coordinator">Coordinator</option>
-                            </select>
-                            <label for="role">Role</label>
-                        </div>
+                    <form action="" method="POST" id="createUserForm">
 
                         <div class="form-floating form-floating-outline mb-4">
                             <input type="text" class="form-control" name="username" id="username" placeholder="username" />
@@ -56,7 +94,7 @@ const CreateUser = () => {
                                 <label class="form-check-label" for="is_active_0"> Deactive </label>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Register</button>
+                        <button type="submit" onClick={submitCreateUserForm} class="btn btn-primary">Register</button>
                     </form>
                 </div>
             </div>
@@ -64,16 +102,68 @@ const CreateUser = () => {
     );
 };
 
-const ManageUser = () => {
+const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
+
+    // fetch user list from database url manage-user
+    const [userList, setUserList] = React.useState([]);
+    React.useEffect(() => {
+        fetch('/development/manage-user')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setUserList(data.userList);
+                } else {
+                    console.log('Failed to fetch user list. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
+
+    // delete user
+    const deleteUser = (userId) => {
+        fetch(`/development/delete-user?id=${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('User deleted successfully');
+                    // remove the deleted user from userList
+                    const newUserList = userList.filter(user => user.id !== userId);
+                    setUserList(newUserList);
+                } else {
+                    console.log('Failed to delete user. Status:', data.status);
+                }
+                setMessage(data.message);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
     return (
         <div class="col-md-12 col-lg-12">
+            {getMessage && (
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {getMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <div class="card">
                 <h5 class="card-header">Manage Users</h5>
                 <div class="table-responsive text-nowrap">
                     <table class="table">
                         <thead class="table-light">
                             <tr>
-                                <th class="text-truncate">User</th>
+                                <th class="text-truncate">Username</th>
                                 <th class="text-truncate">Email</th>
                                 <th class="text-truncate">Role</th>
                                 <th class="text-truncate">Status</th>
@@ -81,41 +171,46 @@ const ManageUser = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar avatar-sm me-3">
-                                            <img src="/static/development/assets/img/avatars/1.png" alt="Avatar" class="rounded-circle" />
+                            {userList.map((user, index) => (
+                                <tr key={index}>
+                                    <td class="text-truncate">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm me-3">
+                                                <img src="/static/development/assets/img/avatars/1.png" alt="Avatar" class="rounded-circle" />
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 text-truncate">{user.username}</h6>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h6 class="mb-0 text-truncate">Shamim Hossain</h6>
-                                            <small class="text-truncate">@user_a</small>
+                                    </td>
+                                    <td class="text-truncate">{user.email}</td>
+                                    {/* check superuser */}
+                                    <td class="text-truncate">{user.is_superuser ? 'Superuser' : ''}</td>
+                                    <td>
+                                        {user.is_active ? (
+                                            <span class="badge bg-label-success rounded-pill">Active</span>
+                                        ) : (
+                                            <span class="badge bg-label-danger rounded-pill">Inactive</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                <i class="mdi mdi-dots-vertical"></i>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="javascript:void(0);"
+                                                ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
+                                                >
+                                                <a class="dropdown-item" href="javascript:void(0);" onClick={(e) => {e.preventDefault; deleteUser(user.id)}}
+                                                ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
+                                                >
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="text-truncate">shamimhcp@gmail.com</td>
-                                <td class="text-truncate">
-                                    superuser
-                                </td>
-                                <td>
-                                    <span class="badge bg-label-success rounded-pill">Active</span>
-                                </td>
-                                <td>
-                                    <div class="dropdown">
-                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i class="mdi mdi-dots-vertical"></i>
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="javascript:void(0);"
-                                            ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
-                                            >
-                                            <a class="dropdown-item" href="javascript:void(0);"
-                                            ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                                            >
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            ))}
+                            
                         </tbody>
                     </table>
                 </div>
@@ -204,92 +299,6 @@ const ChangePassword = ({
     );
 };
 
-const ProfileView = () => {
-    return (
-        <div class="col-md-12 col-lg-12">
-            <div class="card mb-4">
-                <h4 class="card-header">Profile Details</h4>
-                {/* <!-- Account --> */}
-                <div class="card-body pt-2 mt-1">
-                    <form id="formAccountSettings" method="POST" onsubmit="return false">
-                        <div class="row gy-4">
-                     
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input
-                                        class="form-control"
-                                        type="text"
-                                        id="firstName"
-                                        name="firstName"
-                                        value="Shamim"
-                                        autofocus />
-                                    <label for="firstName">First Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input class="form-control" type="text" name="lastName" id="lastName" value="Hossain" />
-                                    <label for="lastName">Last Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input
-                                        class="form-control"
-                                        type="text"
-                                        id="email"
-                                        name="email"
-                                        value="shamimhcp@gmail.com"
-                                        placeholder="shamimhcp@gmail.com" />
-                                    <label for="email">E-mail</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="username"
-                                        name="username"
-                                        value="user_a" />
-                                    <label for="organization">Username</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input class="form-control" type="text" name="role" id="lastName" value="Superuser" />
-                                    <label for="lastName">Role</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input class="form-control" type="text" name="date_joined" id="lastName" value="19-12-2023" />
-                                    <label for="lastName">Date Joined</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating form-floating-outline">
-                                    <input
-                                        class="form-control"
-                                        type="text"
-                                        id="status"
-                                        name="status"
-                                        value="Active"
-                                        autofocus />
-                                    <label for="status">Status</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary me-2">Save changes</button>
-                        </div>
-                    </form>
-                </div>
-                {/* <!-- /Account --> */}
-            </div>
-        </div>
-    );
-};
 
 const ReportCountWidget = () => {
     return (
@@ -2112,8 +2121,8 @@ const Navbar = ({handleMenuClick}) => {
                             <input
                                 type="text"
                                 className="form-control border-0 shadow-none bg-body"
-                                placeholder="Search Report..."
-                                aria-label="Search Report..." />
+                                placeholder="Search ..."
+                                aria-label="Search ..." />
                         </div>
                     </div>
                     {/* <!-- /Search --> */}
@@ -2132,7 +2141,7 @@ const Navbar = ({handleMenuClick}) => {
                             </a>
                             <ul className="dropdown-menu dropdown-menu-end mt-3 py-2">
                                 <li>
-                                    <a className="dropdown-item pb-2 mb-1" href="#" onClick={(e) => {e.preventDefault(); handleMenuClick('profile-view'); }}>
+                                    <a className="dropdown-item pb-2 mb-1" href="#" onClick={(e) => {e.preventDefault(); }}>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-shrink-0 me-2 pe-1">
                                                 <div className="avatar avatar-online">
@@ -2140,7 +2149,9 @@ const Navbar = ({handleMenuClick}) => {
                                                 </div>
                                             </div>
                                             <div className="flex-grow-1">
-                                                <h6 className="mb-0">Shamim Hossain</h6>
+                                                <h6 className="mb-0">
+                                                    Shamim Hossain
+                                                </h6>
 
                                                 <small className="text-muted">
                                                     superuser
@@ -2152,13 +2163,7 @@ const Navbar = ({handleMenuClick}) => {
                                 <li>
                                     <div className="dropdown-divider my-1"></div>
                                 </li>
-                                <li>
-                                    <a className="dropdown-item" href="#"
-                                        onClick={(e) => {e.preventDefault(); handleMenuClick('profile-view'); }}>
-                                        <i className="mdi mdi-account-outline me-1 mdi-20px"></i>
-                                        <span className="align-middle">My Profile</span>
-                                    </a>
-                                </li>
+                             
                                 <li>
                                     <a className="dropdown-item" href="#"
                                         onClick={(e) => {e.preventDefault(); handleMenuClick('change-password'); }}>
@@ -2351,9 +2356,12 @@ const App = () => {
                                         uniqueBuyerListRequirement={uniqueBuyerListRequirement} setUniqueBuyerListRequirement={setUniqueBuyerListRequirement} 
                                         requirementList={requirementList} setRequirementList={setRequirementList} getRequirementList={getRequirementList}  /> }
 
-                                    {currentView === 'create-user' && <CreateUser /> }
-                                    {currentView === 'manage-user' && <ManageUser /> }
-                                    {currentView === 'profile-view' && <ProfileView /> }
+                                    {currentView === 'create-user' && <CreateUser currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}  
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
+
+                                    {currentView === 'manage-user' && <ManageUser currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}  
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
+
                                     {currentView === 'change-password' && <ChangePassword 
                                         getMessage={getMessage} setMessage={setMessage} 
                                         currentView={currentView} setCurrentView={setCurrentView} /> }

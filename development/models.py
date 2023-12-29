@@ -5,19 +5,10 @@ from django.utils import timezone
 
 # Create your models here.
 class User(AbstractUser):
-    ROLE_CHOICES = [
-        ('incharge', 'Incharge'),
-        ('coordinator', 'Coordinator'),
-    ]
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     is_active = models.BooleanField(default=False)
 
-    # Adding related_name to avoid clashes with the default auth.User model
-    groups = models.ManyToManyField(Group, related_name='custom_user_set')
-    user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')
-
     def __str__(self):
-        return f"{self.username}, {self.role}"
+        return f"{self.username}"
 
 class Buyer(models.Model):
     name = models.CharField(max_length=100, unique=True)

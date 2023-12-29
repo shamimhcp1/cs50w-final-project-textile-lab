@@ -48,6 +48,8 @@ urlpatterns = [
     # users
     path('manage-user', views.manage_user, name='manage-user'),
     path('create-user', views.create_user, name='create-user'),
+    # delete user
+    path('delete-user', views.delete_user, name='delete-user'),
     
     # profile
     path('profile-view', views.profile_view, name='profile-view'),
