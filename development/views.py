@@ -27,6 +27,10 @@ def index(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def download_report(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to download report'}, status=status.HTTP_400_BAD_REQUEST)
+    
     report_id = request.GET.get('id')
     report = get_object_or_404(DevReport, pk=report_id)
     # get required data from report
@@ -48,6 +52,10 @@ def download_report(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def view_report(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to view report'}, status=status.HTTP_400_BAD_REQUEST)
+    
     report_id = request.GET.get('id')
     report = get_object_or_404(DevReport, pk=report_id)
     # get required data from report
@@ -67,6 +75,10 @@ def view_report(request):
 @login_required(login_url='login')
 @api_view(['POST'])
 def create_report(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return Response({'status': 'error', 'message': 'You are not authorized to create report'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "POST":
         try:
             data = request.data
@@ -94,6 +106,10 @@ def create_report(request):
 @login_required(login_url='login')
 @require_http_methods(["GET", "PUT"])
 def edit_report(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to edit report'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             report_id = request.GET.get('id')
@@ -130,6 +146,10 @@ def edit_report(request):
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
 def delete_report(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete report'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "DELETE":
         try:
             report_id = request.GET.get('id')
@@ -145,6 +165,10 @@ def delete_report(request):
 @login_required(login_url='login')
 @api_view(['POST'])
 def create_buyer(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return Response({'status': 'error', 'message': 'You are not authorized to create buyer'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "POST":
         try:
             data = request.data
@@ -162,6 +186,10 @@ def create_buyer(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def manage_buyer(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to manage buyer'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             # get all buyers ordered by name
@@ -177,6 +205,10 @@ def manage_buyer(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def buyer_list_requirement(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to get buyer list'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             # get set() of buyers from DevRequirementSerializer 
@@ -191,6 +223,10 @@ def buyer_list_requirement(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def get_active_buyer(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to get buyer list'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             # get all buyers ordered by name
@@ -205,6 +241,10 @@ def get_active_buyer(request):
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
 def delete_buyer(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete buyer'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "DELETE":
         try:
             buyer_id = request.GET.get('id')
@@ -220,6 +260,10 @@ def delete_buyer(request):
 @login_required(login_url='login')
 @require_http_methods(["GET", "PUT"])
 def edit_buyer(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to edit buyer'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             buyer_id = request.GET.get('id')
@@ -249,6 +293,10 @@ def edit_buyer(request):
 @login_required(login_url='login')
 @api_view(['POST'])
 def create_requirement(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return Response({'status': 'error', 'message': 'You are not authorized to create requirement'}, status=status.HTTP_400_BAD_REQUEST)
+
     if request.method == "POST":
         try:
             data = request.data
@@ -267,6 +315,10 @@ def create_requirement(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def manage_requirement(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to manage requirement'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             # get all buyers ordered by name
@@ -283,6 +335,10 @@ def manage_requirement(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def get_requirement_by_buyer(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to get requirement list'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             buyer_id = request.GET.get('id')
@@ -299,6 +355,10 @@ def get_requirement_by_buyer(request):
 @login_required(login_url='login')
 @require_http_methods(["GET", "PUT"])
 def edit_requirement(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to edit requirement'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             requirement_id = request.GET.get('id')
@@ -328,6 +388,10 @@ def edit_requirement(request):
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
 def delete_requirement(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete requirement'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "DELETE":
         try:
             requirement_id = request.GET.get('id')
@@ -343,9 +407,13 @@ def delete_requirement(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def manage_report(request):
+    # check if user not is_staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to manage report'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
-            # get all buyers ordered by name
+            # get all reports ordered by id
             reports = DevReport.objects.all().order_by('-id')
             serializer = DevReportSerializer(reports, many=True)
             return JsonResponse({'status': 'success', 'reportList': serializer.data})
@@ -382,6 +450,10 @@ def change_password(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def manage_user(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to manage user'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "GET":
         try:
             # get all users ordered by username
@@ -399,6 +471,10 @@ def manage_user(request):
 @login_required(login_url='login')
 @api_view(['POST'])
 def create_user(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return Response({'status': 'error', 'message': 'You are not authorized to create user'}, status=status.HTTP_400_BAD_REQUEST)
+    
     if request.method == "POST":
         try:
             data = request.data
@@ -418,7 +494,7 @@ def create_user(request):
             
             # create user
             user = User.objects.create_user(data['username'], data['email'], data['password'])
-            user.is_active = data['is_active']
+            
             # check if data role is superuser or staff
             if data['role'] == "superuser":
                 user.is_superuser = True
@@ -426,6 +502,11 @@ def create_user(request):
             elif data['role'] == "staff":
                 user.is_superuser = False
                 user.is_staff = True
+            else:
+                user.is_superuser = False
+                user.is_staff = False
+            
+            user.is_active = data['is_active']
             user.save()
             return Response({'status': 'success', 'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -433,15 +514,92 @@ def create_user(request):
             traceback.print_exc()
             return Response({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# edit_user
+@login_required(login_url='login')
+@require_http_methods(["GET", "PUT"])
+def edit_user(request):
+    # check if user not is_superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to edit user'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == "GET":
+        try:
+            user_id = request.GET.get('id')
+            user = get_object_or_404(User, pk=user_id)
+            serializer = UserSerializer(user)
+            return JsonResponse({'status': 'success', 'user': serializer.data})
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            user_id = data.get('id')
+            user = get_object_or_404(User, pk=user_id)
+            # check if username already exists
+            if User.objects.filter(username=data['username']).exclude(pk=user_id).exists():
+                return Response({'status': 'error', 'message': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # check if email already exists
+            if User.objects.filter(email=data['email']).exclude(pk=user_id).exists():
+                return Response({'status': 'error', 'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # check if data has password and confirmation
+            if data['password'] and data['confirmation']:
+                # check if password and confirmation is same
+                if data['password'] != data['confirmation']:
+                    return Response({'status': 'error', 'message': 'Password and Confirm Password is not same'}, status=status.HTTP_400_BAD_REQUEST)
+                # change password
+                user.set_password(data['password'])
+            
+            # check if data role is superuser or staff
+            if data['role'] == "superuser":
+                user.is_superuser = True
+                user.is_staff = True
+            elif data['role'] == "staff":
+                user.is_superuser = False
+                user.is_staff = True
+            else:
+                user.is_superuser = False
+                user.is_staff = False
+            
+            user.is_active = data['is_active']
+            user.save()
+            return JsonResponse({'status': 'success', 'message': 'User updated successfully'})
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# get_user_details of logged in user
+@login_required(login_url='login')
+@require_http_methods(["GET"])
+def get_user_details(request):
+    if request.method == "GET":
+        try:
+            user = get_object_or_404(User, pk=request.user.id)
+            serializer = UserSerializer(user)
+            return JsonResponse({'status': 'success', 'user': serializer.data})
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # delete_user
 @login_required(login_url='login')
 @require_http_methods(["DELETE"])
 def delete_user(request):
+    # check if user is superuser
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete user'}, status=status.HTTP_400_BAD_REQUEST)
+            
     if request.method == "DELETE":
         try:
-            # check if user is superuser
-            if not request.user.is_superuser:
-                return JsonResponse({'status': 'error', 'message': 'You are not authorized to delete user'}, status=status.HTTP_400_BAD_REQUEST)
             user_id = request.GET.get('id')
             user = get_object_or_404(User, pk=user_id)
             # check if user is superuser
@@ -460,6 +618,7 @@ def delete_user(request):
 
 # login
 def login_view(request):
+    # check if user is authenticated
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("index"))
 
@@ -491,6 +650,7 @@ def login_view(request):
         return render(request, "development/login.html")
     
 # logout
+@login_required(login_url='login')
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))

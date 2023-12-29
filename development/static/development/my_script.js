@@ -55,11 +55,12 @@ const CreateUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
                     <small class="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div class="card-body">
-                    <form action="" method="POST" id="createUserForm">
+                    <form action="" method="POST" id="createUserForm" autoComplete="off">
                         <div class="form-floating form-floating-outline mb-4">
                             <select class="form-select" name="role" id="role">
                                 <option value="staff">Staff</option>
                                 <option value="superuser">Superuser</option>
+                                <option value="user">User</option>
                             </select>
                             <label for="role">Role</label>
                         </div>
@@ -108,7 +109,135 @@ const CreateUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
     );
 };
 
-const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage}) => {
+const EditUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage, updatedUser, setUpdatedUser}) => {
+    // submitEditUserForm using edit-user url
+    const submitEditUserForm = (e) => {
+        e.preventDefault();
+        const form = document.getElementById('editUserForm');
+        const formData = new FormData(form);
+
+        // formDataObject is a plain object with key-value pairs
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        fetch('/development/edit-user', {
+            method: 'PUT',
+            body: JSON.stringify(formDataObject),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to user list page');
+                    // redirect to user list page
+                    setCurrentView('manage-user'); // Update currentView
+                    setActiveMenuItem('manage-user')
+                } else {
+                    console.log('Failed to edit user. Status:', data.status);      
+                }
+                setMessage(data.message);                
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+
+    return (
+        <div class="col-md-12 col-lg-6">
+            {getMessage && (
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {getMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Add User</h5>
+                    <small class="text-muted float-end">Tusuka-Development</small>
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST" id="editUserForm" autoComplete="off">
+                        <div class="form-floating form-floating-outline mb-4">
+                            <input type="hidden" name="id" value={updatedUser.id} />
+                            <select class="form-select" name="role" id="role"
+                                value={updatedUser.is_superuser ? 'superuser' : updatedUser.is_staff ? 'staff' : 'user'}
+                                onChange={(e) => setUpdatedUser({ ...updatedUser, is_superuser: e.target.value === 'superuser' ? true : false, is_staff: e.target.value === 'staff' ? true : false })}
+                            >
+                                <option value="superuser"
+                                    selected={updatedUser.is_superuser ? true : false}
+                                >Superuser</option>
+                                <option value="staff"
+                                    selected={updatedUser.is_staff ? true : false}
+                                >Staff</option>
+                                <option value="user"
+                                    selected={updatedUser.is_superuser === false && updatedUser.is_staff === false ? true : false}
+                                >User</option>
+                            </select>
+                            <label for="role">Role</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-4">
+                            <input type="text" class="form-control" name="username" id="username" placeholder="username" 
+                                value={updatedUser.username}
+                                onChange={(e) => setUpdatedUser({ ...updatedUser, username: e.target.value })}
+                            />
+                            <label for="username">Username</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-4">
+                            <input type="email" class="form-control" name="email" id="email" placeholder="email" 
+                                value={updatedUser.email}
+                                onChange={(e) => setUpdatedUser({ ...updatedUser, email: e.target.value })}
+                            />
+                            <label for="email">Email</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-4">
+                            <input type="password" class="form-control" name="password" id="password" placeholder="password" />
+                            <label for="Password">Password</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-4">
+                            <input type="password" class="form-control" name="confirmation" id="confirmation" placeholder="Confirm Password" />
+                            <label for="confirmation">Confirm Password</label>
+                        </div>
+                        <div class="form-floating form-floating-outline mb-4">
+                            <div class="form-check mt-3">
+                                <input
+                                    name="is_active"
+                                    class="form-check-input"
+                                    type="radio"
+                                    value={updatedUser.is_active ? '1' : '0'}
+                                    id="is_active_1"
+                                    checked={updatedUser.is_active ? true : false}
+                                    onChange={() => setUpdatedUser({ ...updatedUser, is_active: true })}
+                                    />
+                                <label class="form-check-label" for="is_active_1"> Active </label>
+                            </div>
+                            <div class="form-check">
+                                <input
+                                    name="is_active"
+                                    class="form-check-input"
+                                    type="radio"
+                                    value={updatedUser.is_active ? '0' : '1'}
+                                    id="is_active_0" 
+                                    checked={updatedUser.is_active ? false : true}
+                                    onChange={() => setUpdatedUser({ ...updatedUser, is_active: false })}
+                                    />
+                                <label class="form-check-label" for="is_active_0"> Deactive </label>
+                            </div>
+                        </div>
+                        <button type="submit" onClick={submitEditUserForm} class="btn btn-primary">Update User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}
+const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage, setMessage, updatedUser, setUpdatedUser}) => {
 
     // fetch user list from database url manage-user
     const [userList, setUserList] = React.useState([]);
@@ -155,6 +284,27 @@ const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
             });
     };
 
+    // editUser
+    const editUser = (userId) => {
+        fetch(`/development/edit-user?id=${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('User fetched successfully');
+                    setUpdatedUser(data.user); // Update updatedUser
+                    setCurrentView('edit-user'); // Update currentView
+                } else {
+                    console.log('Failed to fetch user. Status:', data.status);
+                }
+                setMessage(data.message);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
+            });
+    };
+
     return (
         <div class="col-md-12 col-lg-12">
             {getMessage && (
@@ -177,6 +327,16 @@ const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
                             </tr>
                         </thead>
                         <tbody>
+                            {/* display loading bar before userList show */}
+                            {userList.length === 0 && (
+                                <tr>
+                                    <td colSpan="5" class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
                             {userList.map((user, index) => (
                                 <tr key={index}>
                                     <td class="text-truncate">
@@ -212,10 +372,10 @@ const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
                                                 <i class="mdi mdi-dots-vertical"></i>
                                             </button>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);"
+                                                <a class="dropdown-item" href="#" onClick={(e) => {e.preventDefault; editUser(user.id)}}
                                                 ><i class="mdi mdi-pencil-outline me-1"></i> Edit</a
                                                 >
-                                                <a class="dropdown-item" href="javascript:void(0);" onClick={(e) => {e.preventDefault; deleteUser(user.id)}}
+                                                <a class="dropdown-item" href="#" onClick={(e) => {e.preventDefault; deleteUser(user.id)}}
                                                 ><i class="mdi mdi-trash-can-outline me-1"></i> Delete</a
                                                 >
                                             </div>
@@ -232,12 +392,7 @@ const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
     );
 };
 
-const ChangePassword = ({
-    getMessage, 
-    setMessage,
-    currentView,
-    setCurrentView,
-}) => {
+const ChangePassword = ({ getMessage, setMessage, currentView, setCurrentView, }) => {
     // submitChangePasswordForm
     const submitChangePasswordForm = (e) => {
         e.preventDefault();
@@ -319,7 +474,7 @@ const ReportCountWidget = () => {
             <div className="card">
                 <div className="card-header">
                     <div className="d-flex align-items-center justify-content-between">
-                        <h5 className="card-title m-0 me-2">Development Reports</h5>
+                        <h5 className="card-title m-0 me-2">Development updates</h5>
                         <div className="dropdown">
                             <button
                                 className="btn p-0"
@@ -330,14 +485,9 @@ const ReportCountWidget = () => {
                                 aria-expanded="false">
                                 <i className="mdi mdi-dots-vertical mdi-24px"></i>
                             </button>
-                            <div className="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
-                                <a className="dropdown-item" href="javascript:void(0);">Refresh</a>
-                                <a className="dropdown-item" href="javascript:void(0);">Share</a>
-                                <a className="dropdown-item" href="javascript:void(0);">Update</a>
-                            </div>
+                            
                         </div>
                     </div>
-                    <p className="mt-3"><span className="fw-medium">Total 98 reports created</span> 😎 today</p>
                 </div>
                 <div className="card-body">
                     <div className="row g-3">
@@ -1524,6 +1674,7 @@ const CreateReport = ({currentView, setCurrentView, setActiveMenuItem, getMessag
 // Manage Report
 const ManageReport = ({currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport}) => {
     
+    // fetch report list from database url manage-report
     const [reportList, setReportList] = React.useState([]);
     React.useEffect(() => {
         fetch('/development/manage-report')
@@ -1676,6 +1827,7 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage, upda
                                     </td>
                                 </tr>
                             ))}
+                            
                         </tbody>
                     </table>
                 </div>
@@ -1683,6 +1835,7 @@ const ManageReport = ({currentView, setCurrentView, getMessage, setMessage, upda
         </div>
     );
 };
+
 
 // Edit Report
 const EditReport = ({currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport, 
@@ -1952,7 +2105,7 @@ const Footer = () => {
     );
 };
 
-const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
+const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}) => {
 
     return (
         <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme open">
@@ -1982,44 +2135,48 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
                 {/* <!-- Development --> */}
                 <li className="menu-header fw-medium mt-4"><span className="menu-header-text">Development</span></li>
                 {/* <!-- Buyers --> */}
-                <li className={`menu-item ${activeMenuItem === 'create-buyer' || activeMenuItem === 'manage-buyer' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-buyer')}>
-                        <i className="menu-icon tf-icons mdi mdi-star-outline"></i>
-                        <div data-i18n="Authentications">Buyers</div>
-                    </a>
-                    <ul className="menu-sub">
-                        <li className={`menu-item ${activeMenuItem === 'create-buyer' ? 'active' : ''}`}>
-                        <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('create-buyer'); }}>
-                            <div data-i18n="Basic">Create</div>
+                {user.is_superuser && (
+                    <li className={`menu-item ${activeMenuItem === 'create-buyer' || activeMenuItem === 'manage-buyer' ? 'active open' : ''}`}>
+                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-buyer')}>
+                            <i className="menu-icon tf-icons mdi mdi-star-outline"></i>
+                            <div data-i18n="Authentications">Buyers</div>
                         </a>
-                        </li>
-                        <li className={`menu-item ${activeMenuItem === 'manage-buyer' ? 'active' : ''}`}>
-                        <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('manage-buyer'); }}>
-                            <div data-i18n="Basic">Manage Buyers</div>
-                        </a>
-                        </li>
-                    </ul>
-                </li>
+                        <ul className="menu-sub">
+                            <li className={`menu-item ${activeMenuItem === 'create-buyer' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('create-buyer'); }}>
+                                <div data-i18n="Basic">Create</div>
+                            </a>
+                            </li>
+                            <li className={`menu-item ${activeMenuItem === 'manage-buyer' ? 'active' : ''}`}>
+                            <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('manage-buyer'); }}>
+                                <div data-i18n="Basic">Manage Buyers</div>
+                            </a>
+                            </li>
+                        </ul>
+                    </li>
+                )}
                 {/* <!-- Requirements --> */}
-                <li className={`menu-item ${activeMenuItem === 'create-requirement' || activeMenuItem === 'manage-requirement' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-requirement')}>
-                        <i className="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
-                        <div data-i18n="Misc">Requirements</div>
-                    </a>
-                    <ul className="menu-sub">
-                        <li className={`menu-item ${activeMenuItem === 'create-requirement' ? 'active' : ''}`}>
-                            <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('create-requirement'); }}>
-                                <div data-i18n="Error">Create</div>
-                            </a>
-                        </li>
-                        <li className={`menu-item ${activeMenuItem === 'manage-requirement' ? 'active' : ''}`}>
-                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-requirement'); }}>
-                                <div data-i18n="Under Maintenance">Manage Requirements</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
+                {user.is_superuser && (
+                    <li className={`menu-item ${activeMenuItem === 'create-requirement' || activeMenuItem === 'manage-requirement' ? 'active open' : ''}`}>
+                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-requirement')}>
+                            <i className="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
+                            <div data-i18n="Misc">Requirements</div>
+                        </a>
+                        <ul className="menu-sub">
+                            <li className={`menu-item ${activeMenuItem === 'create-requirement' ? 'active' : ''}`}>
+                                <a href="#" className="menu-link" onClick={(e) => { e.preventDefault(); handleMenuClick('create-requirement'); }}>
+                                    <div data-i18n="Error">Create</div>
+                                </a>
+                            </li>
+                            <li className={`menu-item ${activeMenuItem === 'manage-requirement' ? 'active' : ''}`}>
+                                <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-requirement'); }}>
+                                    <div data-i18n="Under Maintenance">Manage Requirements</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                )}
+                
                 {/* <!-- Reports --> */}
                 <li className={`menu-item ${activeMenuItem === 'create-report' || activeMenuItem === 'manage-report' ? 'active open' : ''}`}>
                     <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-report')}>
@@ -2040,36 +2197,41 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
 
                     </ul>
                 </li>
-
+                
                 {/* <!-- Misc --> */}
-                <li className="menu-header fw-medium mt-4"><span className="menu-header-text">Misc</span></li>
+                {user.is_superuser && (
+                    <li className="menu-header fw-medium mt-4"><span className="menu-header-text">Misc</span></li>
+                )}
                 {/* <!-- Users --> */}
-                <li className={`menu-item ${activeMenuItem === 'create-user' || activeMenuItem === 'manage-user' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-user')}>
-                        <i className="menu-icon tf-icons mdi mdi-account-outline"></i>
-                        <div data-i18n="Account Settings">Users</div>
-                    </a>
-                    <ul className="menu-sub">
-                        <li className={`menu-item ${activeMenuItem === 'create-user' ? 'active' : ''}`}>
-                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('create-user'); }}>
-                                <div data-i18n="Account">Create</div>
-                            </a>
-                        </li>
-                        <li className={`menu-item ${activeMenuItem === 'manage-user' ? 'active' : ''}`}>
-                            <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-user'); }}>
-                                <div data-i18n="Notifications">Manage Users</div>
-                            </a>
-                        </li>
+                {user.is_superuser && (
+                    <li className={`menu-item ${activeMenuItem === 'create-user' || activeMenuItem === 'manage-user' ? 'active open' : ''}`}>
+                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-user')}>
+                            <i className="menu-icon tf-icons mdi mdi-account-outline"></i>
+                            <div data-i18n="Account Settings">Users</div>
+                        </a>
+                        <ul className="menu-sub">
+                            <li className={`menu-item ${activeMenuItem === 'create-user' ? 'active' : ''}`}>
+                                <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('create-user'); }}>
+                                    <div data-i18n="Account">Create</div>
+                                </a>
+                            </li>
+                            <li className={`menu-item ${activeMenuItem === 'manage-user' ? 'active' : ''}`}>
+                                <a href="#" className="menu-link" onClick={(e) => {e.preventDefault(); handleMenuClick('manage-user'); }}>
+                                    <div data-i18n="Notifications">Manage Users</div>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                        </ul>
+                    </li>
+                )}
+                
                 <li className="menu-item">
                     <a
                         href="https://github.com/shamimhcp1"
                         target="_blank"
                         className="menu-link">
                         <i className="menu-icon tf-icons mdi mdi-lifebuoy"></i>
-                        <div data-i18n="Support">About Us</div>
+                        <div data-i18n="Support">About</div>
                     </a>
                 </li>
 
@@ -2079,7 +2241,7 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem}) => {
     );
 };
 
-const Navbar = ({handleMenuClick}) => {
+const Navbar = ({handleMenuClick, user, setUser}) => {
     const [isSidebarExpanded, setIsSidebarExpanded] = React.useState(true); // Add this line
 
     const toggleSidebar = (e) => {
@@ -2113,8 +2275,16 @@ const Navbar = ({handleMenuClick}) => {
         };
     }, []); // Empty dependency array means this effect runs once when the component mounts
 
+    
     return (
         <div>
+            {/* show a warning div that this account is not staff */}
+            {!user.is_staff && (
+                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning!</strong> This account is not "staff account". Please contact with admin.
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            )}
             <nav
                 className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
                 id="layout-navbar">
@@ -2163,11 +2333,13 @@ const Navbar = ({handleMenuClick}) => {
                                             </div>
                                             <div className="flex-grow-1">
                                                 <h6 className="mb-0">
-                                                    Shamim Hossain
+                                                    {user.username}
                                                 </h6>
-
+                                                {/* user role */}
                                                 <small className="text-muted">
-                                                    superuser
+                                                    { user.is_superuser && 'Superuser' }
+                                                    { !user.is_superuser && user.is_staff && 'Staff' }
+                                                    { !user.is_superuser && !user.is_staff && 'User' }
                                                 </small>
                                             </div>
                                         </div>
@@ -2209,6 +2381,32 @@ const App = () => {
     const [getMessage, setMessage] = React.useState(null);
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
+    // setUpdatedUser
+    const [updatedUser, setUpdatedUser] = React.useState({
+        username : '',
+        email : '',
+        password : '',
+        is_superuser : '',
+        is_staff : '',
+        is_active : '',
+    });
+    // get logged in user details
+    const [user, setUser] = React.useState({});
+    React.useEffect(() => {
+        fetch('/development/get-user-details')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setUser(data.user);
+                } else {
+                    console.log('Failed to fetch user details. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }, []);
 
     const [uniqueBuyerListRequirement, setUniqueBuyerListRequirement] = React.useState([]);
     // fetch buyer list from database url manage-buyer
@@ -2316,14 +2514,15 @@ const App = () => {
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
                     {/* <!-- Menu --> */}
-                    <Sidebar currentView={currentView} handleMenuClick={handleMenuClick} activeMenuItem={activeMenuItem}/>
+                    <Sidebar currentView={currentView} handleMenuClick={handleMenuClick} activeMenuItem={activeMenuItem}
+                        user={user} setUser={setUser} />
                     {/* <!-- / Menu --> */}
 
                     {/* <!-- Layout container --> */}
                     <div className="layout-page">
 
                         {/* <!-- Navbar --> */}
-                        <Navbar handleMenuClick={handleMenuClick}/>
+                        <Navbar handleMenuClick={handleMenuClick} user={user} setUser={setUser} />
                         {/* <!-- / Navbar --> */}
 
                         {/* <!-- Content wrapper --> */}
@@ -2373,12 +2572,19 @@ const App = () => {
                                         activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
 
                                     {currentView === 'manage-user' && <ManageUser currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}  
-                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} /> }
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} 
+                                        updatedUser={updatedUser} setUpdatedUser={setUpdatedUser} /> }
 
                                     {currentView === 'change-password' && <ChangePassword 
                                         getMessage={getMessage} setMessage={setMessage} 
                                         currentView={currentView} setCurrentView={setCurrentView} /> }
                                     
+                                    {currentView === 'edit-user' && <EditUser
+                                        getMessage={getMessage} setMessage={setMessage}
+                                        currentView={currentView} setCurrentView={setCurrentView} 
+                                        updatedUser={updatedUser} setUpdatedUser={setUpdatedUser}
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} 
+                                        /> }
                                 </div>
                             </div>
                             {/* <!-- / Content --> */}

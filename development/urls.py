@@ -14,7 +14,11 @@ urlpatterns = [
     path('delete-user', views.delete_user, name='delete-user'),
     # change password
     path('change-password', views.change_password, name='change-password'),
-    
+    # get-user-details
+    path('get-user-details', views.get_user_details, name='get-user-details'),
+    # edit user
+    path('edit-user', views.edit_user, name='edit-user'),
+
     # buyer
     path('create-buyer', views.create_buyer, name='create-buyer'),
     path('manage-buyer', views.manage_buyer, name='manage-buyer'),
