@@ -56,7 +56,13 @@ const CreateUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
                 </div>
                 <div class="card-body">
                     <form action="" method="POST" id="createUserForm">
-
+                        <div class="form-floating form-floating-outline mb-4">
+                            <select class="form-select" name="role" id="role">
+                                <option value="staff">Staff</option>
+                                <option value="superuser">Superuser</option>
+                            </select>
+                            <label for="role">Role</label>
+                        </div>
                         <div class="form-floating form-floating-outline mb-4">
                             <input type="text" class="form-control" name="username" id="username" placeholder="username" />
                             <label for="username">Username</label>
@@ -184,8 +190,15 @@ const ManageUser = ({currentView, setCurrentView, setActiveMenuItem, getMessage,
                                         </div>
                                     </td>
                                     <td class="text-truncate">{user.email}</td>
-                                    {/* check superuser */}
-                                    <td class="text-truncate">{user.is_superuser ? 'Superuser' : ''}</td>
+                                    <td class="text-truncate">
+                                        {/* check superuser*/}    
+                                        {user.is_superuser && ( <span class="badge bg-label-success rounded-pill">Superuser</span> )}
+                                        {/* check staff*/}
+                                        {user.is_staff && ( <span class="badge bg-label-primary rounded-pill">Staff</span> )}
+                                        {/* check normal user */}
+                                        {user.is_superuser === false && user.is_staff === false && ( <span class="badge bg-label-warning rounded-pill">User</span> )}
+
+                                    </td>
                                     <td>
                                         {user.is_active ? (
                                             <span class="badge bg-label-success rounded-pill">Active</span>

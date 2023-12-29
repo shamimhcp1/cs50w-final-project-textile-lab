@@ -354,12 +354,6 @@ def manage_report(request):
             return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-# profile
-@login_required(login_url='login')
-def profile_view(request):
-    return render(request, 'development/profile-view.html')
-
-
 # change_password
 @login_required(login_url='login')
 @require_http_methods(["PUT"])
@@ -392,6 +386,7 @@ def manage_user(request):
         try:
             # get all users ordered by username
             users = User.objects.all().order_by('username')
+            print(users) # Log the users
             serializer = UserSerializer(users, many=True)
             return JsonResponse({'status': 'success', 'userList': serializer.data})
         except Exception as e:
@@ -424,6 +419,13 @@ def create_user(request):
             # create user
             user = User.objects.create_user(data['username'], data['email'], data['password'])
             user.is_active = data['is_active']
+            # check if data role is superuser or staff
+            if data['role'] == "superuser":
+                user.is_superuser = True
+                user.is_staff = True
+            elif data['role'] == "staff":
+                user.is_superuser = False
+                user.is_staff = True
             user.save()
             return Response({'status': 'success', 'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -467,12 +469,21 @@ def login_view(request):
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
+        print(user) # Log the user
 
         # Check if authentication successful
         if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            if user.is_active:
+                # User is authenticated and active
+                login(request, user)
+                return HttpResponseRedirect(reverse("index"))
+            else:
+                # User is authenticated but not active
+                return render(request, "development/login.html", {
+                    "message": "Your account is not activated. Please contact admin."
+                })
         else:
+            # Authentication failed (invalid credentials)
             return render(request, "development/login.html", {
                 "message": "Invalid username and/or password."
             })
@@ -486,11 +497,25 @@ def logout_view(request):
 
 # register
 def register(request):
+    # check if user is authenticated
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("index"))
 
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
-        is_active = request.POST.get("is_active", 0)
+
+        # check if username already exists
+        if User.objects.filter(username=username).exists():
+            return render(request, "development/register.html", {
+                "message": "Username already taken."
+            })
+           
+        # check if email already exists
+        if User.objects.filter(email=email).exists():
+            return render(request, "development/register.html", {
+                "message": "Email already taken."
+            })
 
         # Ensure password matches confirmation
         password = request.POST["password"]
@@ -501,28 +526,12 @@ def register(request):
             })
 
         # Attempt to create new user
-        try:
-            user = User.objects.create_user(username, email, password)
-            user.is_active = is_active
-            user.save()
-        except IntegrityError:
-            return render(request, "development/register.html", {
-                "message": "Username already taken."
-            })
-        if not request.user.is_authenticated:
-            login(request, user)
-            return HttpResponseRedirect(reverse("index"))
-        else:
-            return HttpResponseRedirect(reverse("manage-users"))
-    else:
-        if request.user.is_authenticated and not request.user.is_superuser:
-            return HttpResponseRedirect(reverse("index"))
+        user = User.objects.create_user(username, email, password)
+        user.save()
         
-        return render(request, "development/register.html")
-
-# forgot_password
-def forgot_password(request):
-    if request.user.is_authenticated:
+        # login user
+        login(request, user)
         return HttpResponseRedirect(reverse("index"))
         
-    return render(request, 'development/forgot-password.html')
+    return render(request, "development/register.html")
+

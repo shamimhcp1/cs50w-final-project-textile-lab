@@ -5,7 +5,7 @@ from .models import User, Buyer, DevRequirement, DevReport
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser', 'is_staff')
 
 class BuyerSerializer(serializers.ModelSerializer):
     class Meta:

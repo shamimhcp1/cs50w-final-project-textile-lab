@@ -1,14 +1,14 @@
 import os
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 # Create your models here.
 class User(AbstractUser):
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.username}"
+        return f"Username: {self.username} - Superuser: {self.is_superuser} - Staff: {self.is_staff} - is_active: {self.is_active}"
 
 class Buyer(models.Model):
     name = models.CharField(max_length=100, unique=True)

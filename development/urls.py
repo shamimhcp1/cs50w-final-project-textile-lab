@@ -6,7 +6,14 @@ urlpatterns = [
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
-    path("forgot-password", views.forgot_password, name="forgot-password"), 
+
+    # users
+    path('manage-user', views.manage_user, name='manage-user'),
+    path('create-user', views.create_user, name='create-user'),
+    # delete user
+    path('delete-user', views.delete_user, name='delete-user'),
+    # change password
+    path('change-password', views.change_password, name='change-password'),
     
     # buyer
     path('create-buyer', views.create_buyer, name='create-buyer'),
@@ -44,15 +51,5 @@ urlpatterns = [
     # download-report
     path('download-report', views.download_report, name='download-report'),
 
-
-    # users
-    path('manage-user', views.manage_user, name='manage-user'),
-    path('create-user', views.create_user, name='create-user'),
-    # delete user
-    path('delete-user', views.delete_user, name='delete-user'),
-    
-    # profile
-    path('profile-view', views.profile_view, name='profile-view'),
-    path('change-password', views.change_password, name='change-password'),
 
 ]
