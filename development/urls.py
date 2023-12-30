@@ -55,5 +55,4 @@ urlpatterns = [
     # download-report
     path('download-report', views.download_report, name='download-report'),
 
-
 ]

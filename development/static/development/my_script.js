@@ -471,131 +471,41 @@ const ChangePassword = ({ getMessage, setMessage, currentView, setCurrentView, }
 const ReportCountWidget = () => {
     return (
         <div className="col-lg-12">
-            <div className="card">
-                <div className="card-header">
-                    <div className="d-flex align-items-center justify-content-between">
-                        <h5 className="card-title m-0 me-2">Development updates</h5>
-                        <div className="dropdown">
-                            <button
-                                className="btn p-0"
-                                type="button"
-                                id="transactionID"
-                                data-bs-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false">
-                                <i className="mdi mdi-dots-vertical mdi-24px"></i>
-                            </button>
-                            
-                        </div>
-                    </div>
+              <div class="d-flex flex-wrap" id="icons-container">
+                <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                  <div class="card-body">
+                    <i class="mdi mdi-account-group mdi-36px"></i>
+                    <p class="icon-name text-capitalize text-truncate mb-0 mt-2">Buyers</p>
+                  </div>
                 </div>
-                <div className="card-body">
-                    <div className="row g-3">
-                        <div className="col-md-3 col-6">
-                            <div className="d-flex align-items-center">
-                                <div className="avatar">
-                                    <div className="avatar-initial bg-primary rounded shadow">
-                                        <span className="mdi mdi-form-select"></span>
-                                    </div>
-                                </div>
-                                <div className="ms-3">
-                                    <div className="small mb-1">Reports</div>
-                                    <h5 className="mb-0">98</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-3 col-6">
-                            <div className="d-flex align-items-center">
-                                <div className="avatar">
-                                    <div className="avatar-initial bg-warning rounded shadow">
-                                        <span className="mdi mdi-star-circle"></span>
-                                    </div>
-                                </div>
-                                <div className="ms-3">
-                                    <div className="small mb-1">Buyers</div>
-                                    <h5 className="mb-0">7</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-3 col-6">
-                            <div className="d-flex align-items-center">
-                                <div className="avatar">
-                                    <div className="avatar-initial bg-success rounded shadow">
-                                        <span className="mdi mdi-check-circle"></span>
-                                    </div>
-                                </div>
-                                <div className="ms-3">
-                                    <div className="small mb-1">Result is Ok</div>
-                                    <h5 className="mb-0">45</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-md-3 col-6">
-                            <div className="d-flex align-items-center">
-                                <div className="avatar">
-                                    <div className="avatar-initial bg-danger rounded shadow">
-                                        <span className="mdi mdi-minus-circle"></span>
-                                    </div>
-                                </div>
-                                <div className="ms-3">
-                                    <div className="small mb-1">Result Not Ok</div>
-                                    <h5 className="mb-0">53</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                  <div class="card-body">
+                    {/* requirements icon */}
+                    <i class="mdi mdi-clipboard mdi-36px"></i>
+                    <p class="icon-name text-capitalize text-truncate mb-0 mt-2">Requirements</p>
+                  </div>
                 </div>
-            </div>
-        </div>
-    );
-};
-
-const RecentReportWidget = () => {
-    return (
-        <div className="col-12">
-            <div className="card">
-                <h5 className="card-header">Recent Reports</h5>
-                <div className="table-responsive">
-                    <table className="table">
-                        <thead className="table-light">
-                            <tr>
-                                <th className="text-truncate">#</th>
-                                <th className="text-truncate">Buyer</th>
-                                <th className="text-truncate">Style</th>
-                                <th className="text-truncate">Color</th>
-                                <th className="text-truncate">Sample Type</th>
-                                <th className="text-truncate">Fab Ref</th>
-                                <th className="text-truncate">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="text-truncate">1</td>
-                                <td className="text-truncate">Group Dynamite</td>
-                                <td className="text-truncate">100089151</td>
-                                <td className="text-truncate">Blue</td>
-                                <td className="text-truncate">1st Fit</td>
-                                <td className="text-truncate">3293HRF-WECO-OCS25</td>
-                                <td>
-                                    <div className="dropdown">
-                                        <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i className="mdi mdi-dots-vertical"></i>
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
-                                            >
-                                            <a className="dropdown-item" href="javascript:void(0);"
-                                            ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
-                                            >
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                  <div class="card-body">
+                    {/* reports file icon */}
+                    <i class="mdi mdi-file-document mdi-36px"></i>
+                    <p class="icon-name text-capitalize text-truncate mb-0 mt-2">Reports</p>
+                  </div>
                 </div>
-            </div>
+                <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                  <div class="card-body">
+                    {/* staff icon */}
+                    <i class="mdi mdi-account mdi-36px"></i>
+                    <p class="icon-name text-capitalize text-truncate mb-0 mt-2">Users</p>
+                  </div>
+                </div>
+                <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                  <div class="card-body">
+                    <i class="mdi mdi-key mdi-36px"></i>
+                    <p class="icon-name text-capitalize text-truncate mb-0 mt-2">Change Password</p>
+                  </div>
+                </div>
+              </div>
         </div>
     );
 };
@@ -2105,7 +2015,7 @@ const Footer = () => {
     );
 };
 
-const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}) => {
+const Sidebar = ({ currentView, handleMenuClick, handleMainMenuClick, activeMainMenuItem, activeMenuItem, user, setUser}) => {
 
     return (
         <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme open">
@@ -2132,12 +2042,10 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}
                         <div data-i18n="Email">Dashboard</div>
                     </a>
                 </li>
-                {/* <!-- Development --> */}
-                <li className="menu-header fw-medium mt-4"><span className="menu-header-text">Development</span></li>
                 {/* <!-- Buyers --> */}
                 {user.is_superuser && (
-                    <li className={`menu-item ${activeMenuItem === 'create-buyer' || activeMenuItem === 'manage-buyer' ? 'active open' : ''}`}>
-                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-buyer')}>
+                    <li className={`menu-item ${activeMainMenuItem === 'buyer' ? 'active open' : ''}`}>
+                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMainMenuClick('buyer')}>
                             <i className="menu-icon tf-icons mdi mdi-star-outline"></i>
                             <div data-i18n="Authentications">Buyers</div>
                         </a>
@@ -2157,8 +2065,8 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}
                 )}
                 {/* <!-- Requirements --> */}
                 {user.is_superuser && (
-                    <li className={`menu-item ${activeMenuItem === 'create-requirement' || activeMenuItem === 'manage-requirement' ? 'active open' : ''}`}>
-                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-requirement')}>
+                    <li className={`menu-item ${activeMainMenuItem === 'requirement' ? 'active open' : ''}`}>
+                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMainMenuClick('requirement')}>
                             <i className="menu-icon tf-icons mdi mdi-folder-wrench-outline"></i>
                             <div data-i18n="Misc">Requirements</div>
                         </a>
@@ -2178,8 +2086,8 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}
                 )}
                 
                 {/* <!-- Reports --> */}
-                <li className={`menu-item ${activeMenuItem === 'create-report' || activeMenuItem === 'manage-report' ? 'active open' : ''}`}>
-                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-report')}>
+                <li className={`menu-item ${activeMainMenuItem === 'report' ? 'active open' : ''}`}>
+                    <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMainMenuClick('report')}>
                         <i className="menu-icon tf-icons mdi mdi-form-select"></i>
                         <div data-i18n="Misc">Reports</div>
                     </a>
@@ -2198,14 +2106,10 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}
                     </ul>
                 </li>
                 
-                {/* <!-- Misc --> */}
-                {user.is_superuser && (
-                    <li className="menu-header fw-medium mt-4"><span className="menu-header-text">Misc</span></li>
-                )}
                 {/* <!-- Users --> */}
                 {user.is_superuser && (
-                    <li className={`menu-item ${activeMenuItem === 'create-user' || activeMenuItem === 'manage-user' ? 'active open' : ''}`}>
-                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMenuClick('create-user')}>
+                    <li className={`menu-item ${activeMainMenuItem === 'user' ? 'active open' : ''}`}>
+                        <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={() => handleMainMenuClick('user')}>
                             <i className="menu-icon tf-icons mdi mdi-account-outline"></i>
                             <div data-i18n="Account Settings">Users</div>
                         </a>
@@ -2225,15 +2129,6 @@ const Sidebar = ({ currentView, handleMenuClick , activeMenuItem, user, setUser}
                     </li>
                 )}
                 
-                <li className="menu-item">
-                    <a
-                        href="https://github.com/shamimhcp1"
-                        target="_blank"
-                        className="menu-link">
-                        <i className="menu-icon tf-icons mdi mdi-lifebuoy"></i>
-                        <div data-i18n="Support">About</div>
-                    </a>
-                </li>
 
                 {/* <!-- Misc --> */}
             </ul>
@@ -2381,6 +2276,7 @@ const App = () => {
     const [getMessage, setMessage] = React.useState(null);
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
+    const [activeMainMenuItem, setActiveMainMenuItem] = React.useState(null);
     // setUpdatedUser
     const [updatedUser, setUpdatedUser] = React.useState({
         username : '',
@@ -2508,14 +2404,18 @@ const App = () => {
         setActiveMenuItem(activeMenuItem === view ? null : view);
     };
     
+    const handleMainMenuClick = (view) => {
+        setActiveMainMenuItem(activeMainMenuItem === view ? null : view);
+    };
+
     return (
         <div>
             {/* <!-- Layout wrapper --> */}
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
                     {/* <!-- Menu --> */}
-                    <Sidebar currentView={currentView} handleMenuClick={handleMenuClick} activeMenuItem={activeMenuItem}
-                        user={user} setUser={setUser} />
+                    <Sidebar currentView={currentView} handleMenuClick={handleMenuClick} handleMainMenuClick={handleMainMenuClick} 
+                        activeMenuItem={activeMenuItem} activeMainMenuItem={activeMainMenuItem} user={user} setUser={setUser} />
                     {/* <!-- / Menu --> */}
 
                     {/* <!-- Layout container --> */}
@@ -2533,7 +2433,6 @@ const App = () => {
                                     {currentView === 'dashboard' && (
                                         <>
                                         <ReportCountWidget />
-                                        <RecentReportWidget />
                                         </>
                                     )}
                                     
