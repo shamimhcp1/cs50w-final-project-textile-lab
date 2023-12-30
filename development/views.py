@@ -16,6 +16,8 @@ from rest_framework import serializers, status
 from .models import Buyer, DevReport, User, DevRequirement
 from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer, UserSerializer
 from .utils import render_to_pdf, generate_result
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 # index
 @login_required(login_url='login')
@@ -407,20 +409,36 @@ def delete_requirement(request):
 @login_required(login_url='login')
 @require_http_methods(["GET"])
 def manage_report(request):
-    # check if user not is_staff
+    # check if user is not staff
     if not request.user.is_staff:
-        return JsonResponse({'status': 'error', 'message': 'You are not authorized to manage report'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to manage reports'}, status=status.HTTP_400_BAD_REQUEST)
     
-    if request.method == "GET":
-        try:
-            # get all reports ordered by id
-            reports = DevReport.objects.all().order_by('-id')
-            serializer = DevReportSerializer(reports, many=True)
-            return JsonResponse({'status': 'success', 'reportList': serializer.data})
-        except Exception as e:
-            print(e)
-            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    try:
+        # get page and limit from request, default to 1 and 10 if not provided
+        page = int(request.GET.get('page', 1))
+        limit = int(request.GET.get('limit', 10))
         
+        # get all reports ordered by id
+        reports = DevReport.objects.all().order_by('-id')
+        
+        # paginate the queryset
+        paginator = Paginator(reports, limit)
+        
+        try:
+            reports = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            reports = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            reports = paginator.page(paginator.num_pages)
+        
+        serializer = DevReportSerializer(reports, many=True)
+        return JsonResponse({'status': 'success', 'reportList': serializer.data, 'totalPages': paginator.num_pages, 'totalReports': paginator.count})
+    
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # change_password
 @login_required(login_url='login')
