@@ -1,7 +1,7 @@
 # cs50w-final-project-textile-lab
 TextileLab Report Builder: Create garment test reports with ease! This web app, built using Python and JavaScript, simplifies the process of generating comprehensive lab reports for textiles. It offers a user-friendly interface for entering data and produces detailed reports, making textile testing more efficient. 
 
-# distinctiveness and complexity
+# Distinctiveness and complexity
 The distinctiveness and complexity of this project lie in its focus on the textile industry and the specific needs of generating lab reports for textile testing. TextileLab is tailored to the unique requirements of textile properties.
 
 ## Key Features
@@ -21,12 +21,12 @@ What’s contained in each file I've created, e.g., main directories and their p
 - **static/my_script.js:** This file houses all the React.js code for the project. It plays a crucial role in the frontend development, handling dynamic aspects of the user interface.
 - **static/assets/:** The `assets` directory contains necessary files for the theme's static components, including CSS, JavaScript, and images. 
 
-# How to run the application.
+# How to run the application
 
 ### Step 1: Clone the Repository
+`git clone https://github.com/shamimhcp1/cs50w-final-project-textile-lab.git`
 
 ### Step 2: Install Dependencies
-
 `pip install -r requirements.txt`
 
 ### Step 3: Database Setup
@@ -50,13 +50,13 @@ The development server should now be running at `http://127.0.0.1:8000/`.
 The TextileLab Report Builder includes three types of roles: Superuser, Staff, and Normal User, each with different access permissions.
 
 ##### Superuser Account
-username: `user_a`
-password: `user_a`
+- username: `user_a`
+- password: `user_a`
 Superusers have elevated privileges and can access all features of the application.
 
 ##### Staff Account
-username: `coordinator_lab`
-password: `coordinator_lab`
+- username: `coordinator_lab`
+- password: `coordinator_lab`
 Staff accounts are intended for users with basic permissions for data entry and report generation.
 
 ##### Normal Account

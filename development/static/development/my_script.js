@@ -52,7 +52,6 @@ const CreateUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Add User</h5>
-                    <small class="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div class="card-body">
                     <form action="" method="POST" id="createUserForm" autoComplete="off">
@@ -160,7 +159,6 @@ const EditUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage, 
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Add User</h5>
-                    <small class="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div class="card-body">
                     <form action="" method="POST" id="editUserForm" autoComplete="off">
@@ -443,7 +441,6 @@ const ChangePassword = ({ getMessage, setMessage, currentView, setCurrentView, }
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Change Password</h5>
-                    <small class="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="" id="changePasswordForm">
@@ -580,7 +577,6 @@ const CreateBuyer = ({ currentView, setCurrentView, setActiveMenuItem, getMessag
             <div className="card mb-4">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">Create Buyer</h5>
-                    <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
                     <form method="POST" action="" id="createBuyerForm">
@@ -672,7 +668,6 @@ const EditBuyer = ({ currentView, setCurrentView, updatedBuyer, setUpdatedBuyer,
             <div className="card mb-4">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">Edit Buyer</h5>
-                    <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
                     <form method="POST" action="" id="updateBuyerForm">
@@ -922,7 +917,6 @@ const CreateRequirement = ({ currentView, setCurrentView, setActiveMenuItem, get
             <div className="card mb-4">
                 <div className="card-header d-flex align-items-center justify-content-between">
                     <h5 className="mb-0">Add Requirements</h5>
-                    <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
                     <form method="POST" action="" id="createRequirementForm">
@@ -1237,7 +1231,6 @@ const EditRequirement = ({ currentView, setCurrentView, updatedRequirement, setU
             <div className="card mb-4">
                 <div className="card-header d-flex align-items-center justify-content-between">
                     <h5 className="mb-0">Edit Requirement</h5>
-                    <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
                     <form method="POST" action="" id="updateRequirementForm">
@@ -1469,7 +1462,6 @@ const CreateReport = ({ currentView, setCurrentView, setActiveMenuItem, getMessa
             <div className="card mb-4">
                 <div className="card-header d-flex align-items-center justify-content-between">
                     <h5 className="mb-0">Create Report</h5>
-                    <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
                     <form method="POST" action="" id="createReportForm" autoComplete="off">
@@ -1812,7 +1804,6 @@ const EditReport = ({ currentView, setCurrentView, getMessage, setMessage, updat
             <div className="card mb-4">
                 <div className="card-header d-flex align-items-center justify-content-between">
                     <h5 className="mb-0">Edit Report</h5>
-                    <small className="text-muted float-end">Tusuka-Development</small>
                 </div>
                 <div className="card-body">
                     <form method="POST" action="" id="updateReportForm" autoComplete="off">
@@ -2221,7 +2212,7 @@ const Sidebar = ({ currentView, handleMenuClick, handleMainMenuClick, activeMain
         <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme open">
             <div className="app-brand demo">
                 <a href="/development" className="app-brand-link">
-                    <span className="app-brand-text demo menu-text fw-semibold ms-2">Tusuka-Lab</span>
+                    <span className="app-brand-text demo menu-text fw-semibold ms-2">Textile-Lab</span>
                 </a>
 
                 <a href="javascript:void(0);" className="layout-menu-toggle menu-link text-large ms-auto">
