@@ -52,11 +52,13 @@ The TextileLab Report Builder includes three types of roles: Superuser, Staff, a
 ##### Superuser Account
 - username: `user_a`
 - password: `user_a`
+
 Superusers have elevated privileges and can access all features of the application.
 
 ##### Staff Account
 - username: `coordinator_lab`
 - password: `coordinator_lab`
+
 Staff accounts are intended for users with basic permissions for data entry and report generation.
 
 ##### Normal Account
