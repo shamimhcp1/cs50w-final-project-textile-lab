@@ -55,4 +55,7 @@ urlpatterns = [
     # download-report
     path('download-report', views.download_report, name='download-report'),
 
+    # search
+    path('search', views.search, name='search'),
+
 ]

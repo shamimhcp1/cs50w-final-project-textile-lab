@@ -555,6 +555,7 @@ def edit_user(request):
     elif request.method == "PUT":
         try:
             data = json.loads(request.body)
+            print(data) # Log the received data
             user_id = data.get('id')
             user = get_object_or_404(User, pk=user_id)
             # check if username already exists
@@ -712,4 +713,42 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
         
     return render(request, "development/register.html")
+
+
+# search with devReportSerializer fields buyer__name, style, color, fab_ref, sample_type, result
+@login_required(login_url='login')
+@require_http_methods(["GET"])
+def search(request):
+    # check if user is not staff
+    if not request.user.is_staff:
+        return JsonResponse({'status': 'error', 'message': 'You are not authorized to search'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == "GET":
+        try:
+            # get page and limit from request, default to 1 and 10 if not provided
+            page = int(request.GET.get('page', 1))
+            limit = int(request.GET.get('limit', 10))
+            search = request.GET.get('query')
+            # get all reports ordered by id
+            reports = DevReport.objects.filter(buyer__name__icontains=search) | DevReport.objects.filter(style__icontains=search) | DevReport.objects.filter(color__icontains=search) | DevReport.objects.filter(fab_ref__icontains=search) | DevReport.objects.filter(sample_type__icontains=search) | DevReport.objects.filter(result__icontains=search)
+            # paginate the queryset
+            paginator = Paginator(reports, limit)
+            
+            try:
+                reports = paginator.page(page)
+                print(reports) # Log the reports
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                reports = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                reports = paginator.page(paginator.num_pages)
+            
+            serializer = DevReportSerializer(reports, many=True)
+            return JsonResponse({'status': 'success', 'searchResult': serializer.data, 'totalPages': paginator.num_pages, 'totalReports': paginator.count})
+        
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'error', 'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 

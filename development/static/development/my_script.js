@@ -210,7 +210,7 @@ const EditUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage, 
                                     name="is_active"
                                     class="form-check-input"
                                     type="radio"
-                                    value={updatedUser.is_active ? '1' : '0'}
+                                    value="1"
                                     id="is_active_1"
                                     checked={updatedUser.is_active ? true : false}
                                     onChange={() => setUpdatedUser({ ...updatedUser, is_active: true })}
@@ -222,7 +222,7 @@ const EditUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage, 
                                     name="is_active"
                                     class="form-check-input"
                                     type="radio"
-                                    value={updatedUser.is_active ? '0' : '1'}
+                                    value="0"
                                     id="is_active_0"
                                     checked={updatedUser.is_active ? false : true}
                                     onChange={() => setUpdatedUser({ ...updatedUser, is_active: false })}
@@ -1599,7 +1599,8 @@ const CreateReport = ({ currentView, setCurrentView, setActiveMenuItem, getMessa
 
 
 // Manage Report
-const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport }) => {
+const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport,
+    deleteReport, viewReport, downloadReport, editReport }) => {
 
     // fetch report list from database url manage-report with pagination
 
@@ -1631,63 +1632,6 @@ const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, upd
     // handlePageChange
     const handlePageChange = (newPage) => {
         setPage(newPage);
-    };
-
-    // deleteReport
-    const deleteReport = (reportId) => {
-        fetch(`/development/delete-report?id=${reportId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.status === 'success') {
-                    console.log('Report deleted successfully');
-                    // remove the deleted report from reportList
-                    const newReportList = reportList.filter(report => report.id !== reportId);
-                    setReportList(newReportList);
-                    setMessage(data.message);
-                } else {
-                    console.log('Failed to delete report. Status:', data.status);
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    };
-
-    // viewReport
-    const viewReport = (reportId) => {
-        window.open(`/development/view-report?id=${reportId}`, '_blank');
-    };
-
-    // downloadReport
-    const downloadReport = (reportId) => {
-        window.open(`/development/download-report?id=${reportId}`, '_blank');
-    };
-
-    // editReport
-    const editReport = (reportId) => {
-        fetch(`/development/edit-report?id=${reportId}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.status === 'success') {
-                    console.log('Redirecting to edit report page');
-                    // redirect to edit report page
-                    setCurrentView('edit-report'); // Update currentView
-                    setUpdatedReport(data.report); // Update updatedReport
-                } else {
-                    console.log('Failed to fetch report. Status:', data.status);
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
     };
 
     return (
@@ -2084,6 +2028,193 @@ const Footer = () => {
     );
 };
 
+{/* Search Input */}
+const SearchInput = ({ searchQuery, setSearchQuery, currentView, setCurrentView }) => {
+   
+    return (
+      <div className="navbar-nav align-items-center">
+        <div className="nav-item d-flex align-items-center">
+            <i className="mdi mdi-magnify mdi-24px lh-0"></i>
+            <input
+                type="text"
+                className="form-control border-0 shadow-none bg-body"
+                placeholder="Search ..."
+                aria-label="Search ..."
+                value={searchQuery}
+                onChange={(e) => {setSearchQuery(e.target.value); setCurrentView('search-result');} }
+                onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                }}
+            />
+        </div>
+      </div>
+    );
+};
+
+{/* Search Result */}
+const SearchResult = ({ currentView, setCurrentView, searchQuery,
+    getMessage, setMessage, deleteReport, viewReport, downloadReport, editReport
+    }) => {
+
+    const [reportList, setReportList] = React.useState([]);
+    const [page, setPage] = React.useState(1);
+    const [totalPages, setTotalPages] = React.useState(0);
+    const [totalReports, setTotalReports] = React.useState(0);
+    const [limit, setLimit] = React.useState(4);
+    
+    React.useEffect(() => {
+        fetch(`/development/search?page=${page}&limit=${limit}&query=${searchQuery}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    setReportList(data.searchResult);
+                    setTotalPages(data.totalPages);
+                    setTotalReports(data.totalReports);
+                    setCurrentView('search-result');
+                }
+                else {
+                    console.log('Failed to fetch search result. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            }
+            );
+    }, [searchQuery, page, limit]);
+
+    // handlePageChange
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+        return (
+            <div className="col-md-12 col-lg-12">
+                {getMessage && (
+                    <div className="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> {getMessage}
+                        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                )}
+                <div className="card">
+                    <h5 className="card-header">Your search result for : <strong>{searchQuery}</strong> </h5>
+                    <div className="table-responsive text-nowrap">
+                        <table className="table">
+                            <thead className="table-light">
+                                <tr>
+                                    <th className="text-truncate">#</th>
+                                    <th className="text-truncate">Buyer</th>
+                                    <th className="text-truncate">Style</th>
+                                    <th className="text-truncate">Color</th>
+                                    <th className="text-truncate">Result</th>
+                                    <th className="text-truncate">Create Date</th>
+                                    <th className="text-truncate">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {/* display loading bar before reportList show */}
+                                {reportList.length === 0 && (
+                                    <tr>
+                                        <td colSpan="7" className="text-center">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                                {reportList.map((report, index) => (
+                                    <tr key={index}>
+                                        <td className="text-truncate">{index + 1}</td>
+                                        <td className="text-truncate">{report.buyer_name}</td>
+                                        <td className="text-truncate">{report.style}</td>
+                                        <td className="text-truncate">{report.color}</td>
+                                        {/* get result, if result is ok green, if result not ok red, else warning */}
+                                        <td>
+                                            {report.result === 'Result is Ok' ? (
+                                                <span className="badge bg-label-success rounded-pill">Result is Ok</span>
+                                            ) : report.result === 'Result Not Ok' ? (
+                                                <span className="badge bg-label-danger rounded-pill">Result Not OK</span>
+                                            ) : (
+                                                <span className="badge bg-label-warning rounded-pill">See Data Sheet</span>
+                                            )}
+                                        </td>
+                                        <td className="text-truncate">{report.create_date}</td>
+                                        <td>
+                                            <div className="dropdown">
+                                                <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                    <i className="mdi mdi-dots-vertical"></i>
+                                                </button>
+                                                <div className="dropdown-menu">
+                                                    {/* view report */}
+                                                    <a className="dropdown-item" href="javascript:void(0);" onClick={(e) => { e.preventDefault; viewReport(report.id) }}
+                                                    ><i className="mdi mdi-eye-outline me-1"></i> View</a
+                                                    >
+                                                    {/* download report  */}
+                                                    <a className="dropdown-item" href="javascript:void(0);" onClick={(e) => { e.preventDefault; downloadReport(report.id) }}
+                                                    ><i className="mdi mdi-download-outline me-1"></i> Download</a
+                                                    >
+                                                    {/* edit report */}
+                                                    <a className="dropdown-item" href="javascript:void(0);" onClick={(e) => { e.preventDefault; editReport(report.id) }}
+                                                    ><i className="mdi mdi-pencil-outline me-1"></i> Edit</a
+                                                    >
+                                                    {/* delete report */}
+                                                    <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault; deleteReport(report.id) }}
+                                                    ><i className="mdi mdi-trash-can-outline me-1"></i> Delete</a
+                                                    >
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+    
+                            </tbody>
+                        </table>
+                    </div>
+                    {/* card footer */}
+                    <div className="card-footer d-flex align-items-center justify-content-between">
+                        <div className="col-sm-6">
+                            {totalReports > 0 && (
+                                <div className="text-muted">
+                                    Showing <span>{reportList.length}</span> out of <span>{totalReports}</span> reports
+                                </div>
+                            )}
+                        </div>
+    
+                        <div className="col-sm-6 d-flex justify-content-end">
+                            <nav aria-label="Page navigation">
+                                <ul className="pagination">
+                                    <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                                        <a className="page-link" href="javascript:void(0);" onClick={() => handlePageChange(page - 1)}>
+                                            <i className="tf-icon mdi mdi-chevron-double-left"></i>
+                                        </a>
+                                    </li>
+                                    {Array.from({ length: totalPages }, (_, index) => (
+                                        <li key={index} className={`page-item ${page === index + 1 ? 'active' : ''}`}>
+                                            <a className="page-link" href="javascript:void(0);" onClick={() => handlePageChange(index + 1)}>
+                                                {index + 1}
+                                            </a>
+                                        </li>
+                                    ))}
+                                    <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                                        <a className="page-link" href="javascript:void(0);" onClick={() => handlePageChange(page + 1)}>
+                                            <i className="tf-icon mdi mdi-chevron-double-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+    
+                </div>
+    
+            </div>
+    );
+};
+
+
+
 const Sidebar = ({ currentView, handleMenuClick, handleMainMenuClick, activeMainMenuItem, activeMenuItem, user, setUser }) => {
 
     return (
@@ -2207,7 +2338,7 @@ const Sidebar = ({ currentView, handleMenuClick, handleMainMenuClick, activeMain
     );
 };
 
-const Navbar = ({ handleMenuClick, user, setUser }) => {
+const Navbar = ({ currentView, setCurrentView, handleMenuClick, user, setUser, searchQuery, setSearchQuery  }) => {
     const [isSidebarExpanded, setIsSidebarExpanded] = React.useState(true); // Add this line
 
     const toggleSidebar = (e) => {
@@ -2264,16 +2395,7 @@ const Navbar = ({ handleMenuClick, user, setUser }) => {
 
                 <div className="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
                     {/* <!-- Search --> */}
-                    <div className="navbar-nav align-items-center">
-                        <div className="nav-item d-flex align-items-center">
-                            <i className="mdi mdi-magnify mdi-24px lh-0"></i>
-                            <input
-                                type="text"
-                                className="form-control border-0 shadow-none bg-body"
-                                placeholder="Search ..."
-                                aria-label="Search ..." />
-                        </div>
-                    </div>
+                    <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} currentView={currentView} setCurrentView={setCurrentView} />
                     {/* <!-- /Search --> */}
 
                     <ul className="navbar-nav flex-row align-items-center ms-auto">
@@ -2348,6 +2470,11 @@ const App = () => {
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
     const [activeMainMenuItem, setActiveMainMenuItem] = React.useState(null);
+    
+    // search
+    const [searchQuery, setSearchQuery] = React.useState('');
+    console.log(searchQuery)
+    
     // setUpdatedUser
     const [updatedUser, setUpdatedUser] = React.useState({
         username: '',
@@ -2479,21 +2606,84 @@ const App = () => {
         setActiveMainMenuItem(activeMainMenuItem === view ? null : view);
     };
 
+    // deleteReport
+    const deleteReport = (reportId) => {
+        fetch(`/development/delete-report?id=${reportId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Report deleted successfully');
+                    // remove the deleted report from reportList
+                    const newReportList = reportList.filter(report => report.id !== reportId);
+                    setReportList(newReportList);
+                    setMessage(data.message);
+                } else {
+                    console.log('Failed to delete report. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
+    // viewReport
+    const viewReport = (reportId) => {
+        window.open(`/development/view-report?id=${reportId}`, '_blank');
+    };
+
+    // downloadReport
+    const downloadReport = (reportId) => {
+        window.open(`/development/download-report?id=${reportId}`, '_blank');
+    };
+
+    // editReport
+    const editReport = (reportId) => {
+        fetch(`/development/edit-report?id=${reportId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Redirecting to edit report page');
+                    // redirect to edit report page
+                    setCurrentView('edit-report'); // Update currentView
+                    setUpdatedReport(data.report); // Update updatedReport
+                } else {
+                    console.log('Failed to fetch report. Status:', data.status);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
+
     return (
         <div>
             {/* <!-- Layout wrapper --> */}
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
                     {/* <!-- Menu --> */}
-                    <Sidebar currentView={currentView} handleMenuClick={handleMenuClick} handleMainMenuClick={handleMainMenuClick}
-                        activeMenuItem={activeMenuItem} activeMainMenuItem={activeMainMenuItem} user={user} setUser={setUser} />
+                    <Sidebar currentView={currentView} setCurrentView={setCurrentView}
+                        handleMenuClick={handleMenuClick} handleMainMenuClick={handleMainMenuClick}
+                        activeMenuItem={activeMenuItem} activeMainMenuItem={activeMainMenuItem} 
+                        user={user} setUser={setUser} 
+                        getMessage={getMessage} setMessage={setMessage} 
+                        />
                     {/* <!-- / Menu --> */}
 
                     {/* <!-- Layout container --> */}
                     <div className="layout-page">
 
                         {/* <!-- Navbar --> */}
-                        <Navbar handleMenuClick={handleMenuClick} user={user} setUser={setUser} />
+                        <Navbar handleMenuClick={handleMenuClick} user={user} setUser={setUser} 
+                            searchQuery={searchQuery} setSearchQuery={setSearchQuery} 
+                            currentView={currentView} setCurrentView={setCurrentView} />
                         {/* <!-- / Navbar --> */}
 
                         {/* <!-- Content wrapper --> */}
@@ -2532,7 +2722,9 @@ const App = () => {
                                         requirementList={requirementList} setRequirementList={setRequirementList} getRequirementList={getRequirementList} />}
 
                                     {currentView === 'manage-report' && <ManageReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}
-                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} updatedReport={updatedReport} setUpdatedReport={setUpdatedReport} />}
+                                        activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} updatedReport={updatedReport} setUpdatedReport={setUpdatedReport} 
+                                        deleteReport={deleteReport} viewReport={viewReport} downloadReport={downloadReport} editReport={editReport}
+                                        />}
 
                                     {currentView === 'edit-report' && <EditReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}
                                         updatedReport={updatedReport} setUpdatedReport={setUpdatedReport}
@@ -2556,6 +2748,16 @@ const App = () => {
                                         updatedUser={updatedUser} setUpdatedUser={setUpdatedUser}
                                         activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem}
                                     />}
+
+                                    {currentView === 'search-result' && <SearchResult
+                                        getMessage={getMessage} setMessage={setMessage}
+                                        currentView={currentView} setCurrentView={setCurrentView}
+                                        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+                                        deleteReport={deleteReport} 
+                                        viewReport={viewReport} downloadReport={downloadReport}
+                                        editReport={editReport}
+                                    />}
+
                                 </div>
                             </div>
                             {/* <!-- / Content --> */}
