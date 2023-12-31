@@ -2596,11 +2596,21 @@ const App = () => {
         setMessage(null);
     }, 5000);
 
+
     const handleMenuClick = (view) => {
         setCurrentView(view); // Update currentView
+        window.history.pushState(null, '', view); // Update the URL
         console.log('CurrentView: ' + view);
         setActiveMenuItem(activeMenuItem === view ? null : view);
     };
+    
+    window.addEventListener('popstate', (event) => {
+        // Handle back/forward navigation here
+        // You can access the current URL from event.state or window.location.pathname
+        let path = window.location.pathname
+        let [, view] = path.split("/development/") // get the view from url
+        setCurrentView(view); // Update currentView
+    });
 
     const handleMainMenuClick = (view) => {
         setActiveMainMenuItem(activeMainMenuItem === view ? null : view);

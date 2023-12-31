@@ -1,5 +1,5 @@
 import json
-import traceback  # Import the traceback module
+import traceback
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
@@ -8,6 +8,7 @@ from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -16,7 +17,6 @@ from rest_framework import serializers, status
 from .models import Buyer, DevReport, User, DevRequirement
 from .serializers import BuyerSerializer, DevReportSerializer, DevRequirementSerializer, DevReportSerializer, UserSerializer
 from .utils import render_to_pdf, generate_result
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # index
