@@ -28,7 +28,7 @@ What’s contained in each file I've created, e.g., main directories and their p
 # How to run the application
 
 ### Step 1: Clone the Repository
-`git clone -b web50/projects/2020/x/capstone https://github.com/me50/shamimhcp1.git`
+`git clone https://github.com/shamimhcp1/cs50w-final-project-textile-lab.git`
 
 ### Step 2: Install Dependencies
 `pip install -r requirements.txt`
