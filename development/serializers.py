@@ -40,7 +40,7 @@ class DevRequirementSerializer(serializers.ModelSerializer):
 class DevReportSerializer(serializers.ModelSerializer):
     buyer_name = serializers.ReadOnlyField(source='buyer.name')
     requirement_label = serializers.ReadOnlyField(source='requirement.requirement_label')
-    create_by = serializers.ReadOnlyField(source='create_by.username')
+    create_by_username = serializers.ReadOnlyField(source='create_by.username')
 
     class Meta:
         model = DevReport
@@ -71,4 +71,5 @@ class DevReportSerializer(serializers.ModelSerializer):
             'result',
             'create_date',
             'create_by',
+            'create_by_username',
         ]

@@ -9,6 +9,8 @@ The distinctiveness and complexity of this project lie in its focus on the texti
 
 - **Comprehensive Reports:** The generated reports go beyond basic excel data entry, providing detailed insights into textile characteristics. This complexity is essential for users in the textile industry who require specific information for quality control and analysis.
 
+- **Generate Result:** By creating a report into Textile-Lab, it will automatically generate pass/fail result with a utils function.
+
 - **PDF Report Generation and Download:** The system can compile the test report data and create a detailed lab report in PDF format. Clicking on the 'Download' button user can save the report in local machine.
 
 - **Role-Based Access:** The inclusion of different user roles (Superuser, Staff, and Normal User) adds complexity to the project. Each role has distinct permissions, ensuring secure access control.
@@ -26,7 +28,7 @@ What’s contained in each file I've created, e.g., main directories and their p
 # How to run the application
 
 ### Step 1: Clone the Repository
-`git clone https://github.com/shamimhcp1/cs50w-final-project-textile-lab.git`
+`git clone -b web50/projects/2020/x/capstone https://github.com/me50/shamimhcp1.git`
 
 ### Step 2: Install Dependencies
 `pip install -r requirements.txt`

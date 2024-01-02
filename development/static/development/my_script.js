@@ -249,9 +249,11 @@ const ManageUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage
                 } else {
                     console.log('Failed to fetch user list. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     }, []);
 
@@ -279,6 +281,7 @@ const ManageUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     };
 
@@ -570,7 +573,7 @@ const CreateBuyer = ({ currentView, setCurrentView, setActiveMenuItem, getMessag
         <div className="col-md-12 col-lg-6">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -726,9 +729,11 @@ const ManageBuyer = ({ getMessage, setMessage, currentView, setCurrentView, upda
                 } else {
                     console.log('Failed to fetch buyer list. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     }, []);
 
@@ -749,13 +754,13 @@ const ManageBuyer = ({ getMessage, setMessage, currentView, setCurrentView, upda
                     // remove the deleted buyer from buyerList
                     const newBuyerList = buyerList.filter(buyer => buyer.id !== buyerId);
                     setBuyerList(newBuyerList);
-                    setMessage(data.message);
                 } else {
                     console.log('Failed to delete buyer. Status:', data.status);
-                }
+                }setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     };
 
@@ -772,9 +777,11 @@ const ManageBuyer = ({ getMessage, setMessage, currentView, setCurrentView, upda
                 } else {
                     console.log('Failed to fetch buyer. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     };
 
@@ -782,7 +789,7 @@ const ManageBuyer = ({ getMessage, setMessage, currentView, setCurrentView, upda
         <div className="col-md-12 col-lg-6">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -910,7 +917,7 @@ const CreateRequirement = ({ currentView, setCurrentView, setActiveMenuItem, get
         <div className="col-xxl">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -1060,9 +1067,11 @@ const ManageRequirement = ({ currentView, setCurrentView, setActiveMenuItem, get
                 } else {
                     console.log('Failed to fetch dev requirement list. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     }, []);
 
@@ -1083,13 +1092,14 @@ const ManageRequirement = ({ currentView, setCurrentView, setActiveMenuItem, get
                     // remove the deleted requirement from devRequirementList
                     const newDevRequirementList = devRequirementList.filter(devRequirement => devRequirement.id !== requirementId);
                     setDevRequirementList(newDevRequirementList);
-                    setMessage(data.message);
                 } else {
                     console.log('Failed to delete requirement. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     };
 
@@ -1106,9 +1116,11 @@ const ManageRequirement = ({ currentView, setCurrentView, setActiveMenuItem, get
                 } else {
                     console.log('Failed to fetch requirement. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             });
     };
 
@@ -1116,7 +1128,7 @@ const ManageRequirement = ({ currentView, setCurrentView, setActiveMenuItem, get
         <div className="col-md-12 col-lg-8">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -1224,7 +1236,7 @@ const EditRequirement = ({ currentView, setCurrentView, updatedRequirement, setU
         <div className="col-xxl">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -1455,7 +1467,7 @@ const CreateReport = ({ currentView, setCurrentView, setActiveMenuItem, getMessa
         <div className="col-xxl">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -1592,11 +1604,9 @@ const CreateReport = ({ currentView, setCurrentView, setActiveMenuItem, getMessa
 
 // Manage Report
 const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, updatedReport, setUpdatedReport,
-    deleteReport, viewReport, downloadReport, editReport }) => {
+    deleteReport, viewReport, downloadReport, editReport, reportList, setReportList }) => {
 
     // fetch report list from database url manage-report with pagination
-
-    const [reportList, setReportList] = React.useState([]);
     const [page, setPage] = React.useState(1);
     const [totalPages, setTotalPages] = React.useState(0);
     const [totalReports, setTotalReports] = React.useState(0);
@@ -1614,9 +1624,11 @@ const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, upd
                 else {
                     console.log('Failed to fetch report list. Status:', data.status);
                 }
+                setMessage(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Internal Server Error'); // Use a generic error message here
             }
             );
     }, [page, limit]);
@@ -1630,7 +1642,7 @@ const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, upd
         <div className="col-md-12 col-lg-12">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -1645,6 +1657,7 @@ const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, upd
                                 <th className="text-truncate">Style</th>
                                 <th className="text-truncate">Color</th>
                                 <th className="text-truncate">Result</th>
+                                <th className="text-truncate">Create By</th>
                                 <th className="text-truncate">Create Date</th>
                                 <th className="text-truncate">Action</th>
                             </tr>
@@ -1676,6 +1689,7 @@ const ManageReport = ({ currentView, setCurrentView, getMessage, setMessage, upd
                                             <span className="badge bg-label-warning rounded-pill">See Data Sheet</span>
                                         )}
                                     </td>
+                                    <td className="text-truncate">{report.create_by_username}</td>
                                     <td className="text-truncate">{report.create_date}</td>
                                     <td>
                                         <div className="dropdown">
@@ -1797,7 +1811,7 @@ const EditReport = ({ currentView, setCurrentView, getMessage, setMessage, updat
         <div className="col-xxl">
             {getMessage && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {getMessage}
+                    {getMessage}
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             )}
@@ -2085,7 +2099,7 @@ const SearchResult = ({ currentView, setCurrentView, searchQuery,
             <div className="col-md-12 col-lg-12">
                 {getMessage && (
                     <div className="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>Success!</strong> {getMessage}
+                        {getMessage}
                         <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 )}
@@ -2461,7 +2475,8 @@ const App = () => {
     const [currentView, setCurrentView] = React.useState('dashboard');
     const [activeMenuItem, setActiveMenuItem] = React.useState(null);
     const [activeMainMenuItem, setActiveMainMenuItem] = React.useState(null);
-    
+    const [reportList, setReportList] = React.useState([]);
+
     // search
     const [searchQuery, setSearchQuery] = React.useState('');
     console.log(searchQuery)
@@ -2582,10 +2597,10 @@ const App = () => {
         tensile_text: '',
     });
 
-    // useEffect to remove the message after 5 seconds
+    // useEffect to remove the message after 10 seconds
     setTimeout(() => {
         setMessage(null);
-    }, 5000);
+    }, 10000);
 
 
     const handleMenuClick = (view) => {
@@ -2622,15 +2637,17 @@ const App = () => {
                 if (data.status === 'success') {
                     console.log('Report deleted successfully');
                     // remove the deleted report from reportList
-                    const newReportList = reportList.filter(report => report.id !== reportId);
-                    setReportList(newReportList);
-                    setMessage(data.message);
+                    setReportList(reportList.filter(report => report.id !== reportId));
+                    setMessage(data.message); // Update the message
+                    setCurrentView('manage-report'); // Update currentView
                 } else {
                     console.log('Failed to delete report. Status:', data.status);
                 }
+                setMessage(data.message); // Update the message
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setMessage('Something went wrong. Please try again later.'); // Update the message
             });
     };
 
@@ -2725,6 +2742,7 @@ const App = () => {
                                     {currentView === 'manage-report' && <ManageReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}
                                         activeMenuItem={activeMenuItem} setActiveMenuItem={setActiveMenuItem} updatedReport={updatedReport} setUpdatedReport={setUpdatedReport} 
                                         deleteReport={deleteReport} viewReport={viewReport} downloadReport={downloadReport} editReport={editReport}
+                                        reportList={reportList} setReportList={setReportList}
                                         />}
 
                                     {currentView === 'edit-report' && <EditReport currentView={currentView} setCurrentView={setCurrentView} getMessage={getMessage} setMessage={setMessage}

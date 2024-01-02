@@ -251,6 +251,11 @@ def delete_buyer(request):
         try:
             buyer_id = request.GET.get('id')
             buyer = get_object_or_404(Buyer, pk=buyer_id)
+            
+            # check if buyer has created any report
+            if DevReport.objects.filter(buyer=buyer_id).exists():
+                return JsonResponse({'status': 'error', 'message': 'Dev Report created with this Buyer. So, you can not delete PROTECTED buyer'}, status=status.HTTP_400_BAD_REQUEST)
+            
             buyer.delete()
             return JsonResponse({'status': 'success', 'message': 'Buyer deleted successfully'})
         except Exception as e:
@@ -398,6 +403,10 @@ def delete_requirement(request):
         try:
             requirement_id = request.GET.get('id')
             requirement = get_object_or_404(DevRequirement, pk=requirement_id)
+            # check if requirement has created any report
+            if DevReport.objects.filter(requirement=requirement_id).exists():
+                return JsonResponse({'status': 'error', 'message': 'Dev Report created with this requirement. So, you can not delete PROTECTED requirement'}, status=status.HTTP_400_BAD_REQUEST)
+            
             requirement.delete()
             return JsonResponse({'status': 'success', 'message': 'Requirement deleted successfully'})
         except Exception as e:
@@ -434,6 +443,7 @@ def manage_report(request):
             reports = paginator.page(paginator.num_pages)
         
         serializer = DevReportSerializer(reports, many=True)
+        print(serializer.data) # Log the reports
         return JsonResponse({'status': 'success', 'reportList': serializer.data, 'totalPages': paginator.num_pages, 'totalReports': paginator.count})
     
     except Exception as e:
@@ -561,11 +571,17 @@ def edit_user(request):
             # check if username already exists
             if User.objects.filter(username=data['username']).exclude(pk=user_id).exists():
                 return Response({'status': 'error', 'message': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            # update username
+            if 'username' in data:
+                user.username = data['username']
             
             # check if email already exists
             if User.objects.filter(email=data['email']).exclude(pk=user_id).exists():
                 return Response({'status': 'error', 'message': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
-            
+            # update email
+            if 'email' in data:
+                user.email = data['email']
+
             # check if data has password and confirmation
             if data['password'] and data['confirmation']:
                 # check if password and confirmation is same

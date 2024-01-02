@@ -8,7 +8,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Username: {self.username} - Superuser: {self.is_superuser} - Staff: {self.is_staff} - is_active: {self.is_active}"
+        return self.username
 
 class Buyer(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -18,7 +18,7 @@ class Buyer(models.Model):
         return self.name
 
 class DevRequirement(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.PROTECT)
+    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
     requirement_label = models.CharField(max_length=255)
     dry_rubbing = models.CharField(max_length=255, null=True, blank=True)
     wet_rubbing = models.CharField(max_length=255, null=True, blank=True)
