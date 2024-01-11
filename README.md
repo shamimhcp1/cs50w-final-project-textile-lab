@@ -1,3 +1,5 @@
+# TextileLab Report Builder
+
 # Introduction 🚀
 TextileLab Report Builder: Create garment test reports with ease! This web app, built using Python and JavaScript, simplifies the process of generating comprehensive lab reports for textiles. It offers a user-friendly interface for entering data and produces detailed reports, making textile testing more efficient. 
 
@@ -5,7 +7,7 @@ TextileLab Report Builder: Create garment test reports with ease! This web app, 
 The distinctiveness and complexity of this project lie in its focus on the textile industry and the specific needs of generating lab reports for textile testing. TextileLab is tailored to the unique requirements of textile properties.
 
 ## Key Features
-- **Textile-Specific Parameters:** The application is designed to capture and report on textile-specific parameters such as tear strength, tensile strength and colorfastness to rubbing.
+- **Textile-Specific Parameters:** The application is designed to capture and report on textile-specific parameters such as tear strength, tensile strength and colorfastness to rubbing, providing detailed insights crucial for quality control and analysis.
 
 - **Comprehensive Reports:** The generated reports go beyond basic excel data entry, providing detailed insights into textile characteristics. This complexity is essential for users in the textile industry who require specific information for quality control and analysis.
 
@@ -28,7 +30,7 @@ What’s contained in each file I've created, e.g., main directories and their p
 # How to run the application
 
 ### Step 1: Clone the Repository
-`git clone https://github.com/shamimhcp1/cs50w-final-project-textile-lab.git`
+`git clone -b web50/projects/2020/x/capstone https://github.com/me50/shamimhcp1.git`
 
 ### Step 2: Install Dependencies
 `pip install -r requirements.txt`

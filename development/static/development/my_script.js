@@ -158,7 +158,7 @@ const EditUser = ({ currentView, setCurrentView, setActiveMenuItem, getMessage, 
             )}
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Add User</h5>
+                    <h5 class="mb-0">Edit User</h5>
                 </div>
                 <div class="card-body">
                     <form action="" method="POST" id="editUserForm" autoComplete="off">
